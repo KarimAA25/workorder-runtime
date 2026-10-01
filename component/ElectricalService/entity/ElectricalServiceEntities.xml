@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<entities xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+          xsi:noNamespaceSchemaLocation="http://moqui.org/xsd/entity-definition-3.xsd">
+    <!-- ========================================================= -->
+    <!-- ElectricalService                                          -->
+    <!-- ========================================================= -->
+
+    <!-- Thin extension of mantle.work.effort.WorkEffort: a WorkEffort with
+         workEffortTypeEnumId=WetElecVisit IS an electrical service visit. This table
+         adds only the one field WorkEffort has no place for (work notes recorded by
+         the technician). Scheduled/start/end times, status, and technician assignment
+         all live on WorkEffort / WorkEffortParty, reusing Mantle's existing model. -->
+    <entity entity-name="ElectricalServiceVisit" package="ElectricalService" cache="never">
+        <field name="workEffortId" type="id" is-pk="true"/>
+        <field name="workNotes" type="text-long"/>
+        <relationship type="one" related="mantle.work.effort.WorkEffort" short-alias="workEffort"/>
+    </entity>
+
+    <!-- Convenience read view over mantle.request.Request (filtered by requestTypeEnumId=
+         RtElecService) joined to its current Customer and Assignee (technician) RequestParty
+         rows, exposing the field names from the functional spec. Not used for writes;
+         all writes go through mantle.request.Request / RequestParty via the services. -->
+    <view-entity entity-name="ElectricalServiceRequestDetail" package="ElectricalService">
+        <member-entity entity-alias="REQ" entity-name="mantle.request.Request"/>
+        <member-entity entity-alias="RPC" entity-name="mantle.request.RequestParty" join-from-alias="REQ" join-optional="true">
+            <key-map field-name="requestId"/>
+            <entity-condition><econdition field-name="roleTypeId" value="Customer"/>
+                <econdition field-name="thruDate" operator="is-null"/></entity-condition>
+        </member-entity>
+        <member-entity entity-alias="RPA" entity-name="mantle.request.RequestParty" join-from-alias="REQ" join-optional="true">
+            <key-map field-name="requestId"/>
+            <entity-condition><econdition field-name="roleTypeId" value="Assignee"/>
+                <econdition field-name="thruDate" operator="is-null"/></entity-condition>
+        </member-entity>
+        <alias entity-alias="REQ" name="serviceRequestId" field="requestId"/>
+        <alias entity-alias="REQ" name="requestName"/>
+        <alias entity-alias="REQ" name="description"/>
+        <alias entity-alias="REQ" name="priority"/>
+        <alias entity-alias="REQ" name="statusId"/>
+        <alias entity-alias="REQ" name="requestedDate" field="requestDate"/>
+        <alias entity-alias="REQ" name="requestTypeEnumId"/>
+        <alias entity-alias="RPC" name="customerPartyId" field="partyId"/>
+        <alias entity-alias="RPA" name="technicianPartyId" field="partyId"/>
+    </view-entity>
+
+    <!-- Convenience read view over mantle.work.effort.WorkEffort (filtered by
+         workEffortTypeEnumId=WetElecVisit) joined to ElectricalServiceVisit (work notes),
+         the owning Request (via RequestWorkEffort), and the current Assignee
+         (technician) WorkEffortParty row. Not used for writes. -->
+    <view-entity entity-name="ElectricalServiceVisitDetail" package="ElectricalService">
+        <member-entity entity-alias="WE" entity-name="mantle.work.effort.WorkEffort"/>
+        <member-entity entity-alias="ESV" entity-name="ElectricalService.ElectricalServiceVisit" join-from-alias="WE">
+            <key-map field-name="workEffortId"/></member-entity>
+        <member-entity entity-alias="RWE" entity-name="mantle.request.RequestWorkEffort" join-from-alias="WE" join-optional="true">
+            <key-map field-name="workEffortId"/></member-entity>
+        <member-entity entity-alias="WEP" entity-name="mantle.work.effort.WorkEffortParty" join-from-alias="WE" join-optional="true">
+            <key-map field-name="workEffortId"/>
+            <entity-condition><econdition field-name="roleTypeId" value="Assignee"/>
+                <econdition field-name="thruDate" operator="is-null"/></entity-condition>
+        </member-entity>
+        <alias entity-alias="WE" name="serviceVisitId" field="workEffortId"/>
+        <alias entity-alias="WE" name="workEffortTypeEnumId"/>
+        <alias entity-alias="WE" name="workEffortName"/>
+        <alias entity-alias="WE" name="statusId"/>
+        <alias entity-alias="WE" name="scheduledDate" field="estimatedStartDate"/>
+        <alias entity-alias="WE" name="startTime" field="actualStartDate"/>
+        <alias entity-alias="WE" name="endTime" field="actualCompletionDate"/>
+        <alias entity-alias="ESV" name="workNotes"/>
+        <alias entity-alias="RWE" name="serviceRequestId" field="requestId"/>
+        <alias entity-alias="WEP" name="technicianPartyId" field="partyId"/>
+    </view-entity>
+</entities>

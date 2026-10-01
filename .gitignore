@@ -22,9 +22,6 @@
 # common runtime added files
 /classes/*.pem
 /lib/*.jar
-/component/
-/ecomponent/
-/mantle/
 
 # jackrabbit standalone jar file
 /jackrabbit/jackrabbit-standalone-*.jar

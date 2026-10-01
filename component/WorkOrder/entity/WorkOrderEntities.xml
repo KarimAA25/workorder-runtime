@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<entities xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+          xsi:noNamespaceSchemaLocation="http://moqui.org/xsd/entity-definition-3.xsd">
+    <!-- ========================================================= -->
+    <!-- WorkOrder                                                  -->
+    <!-- ========================================================= -->
+
+    <!-- Maps onto the pre-existing Oracle table WORK_ORDER in the "jde" datasource
+         (runtime-add-missing / startup-add-missing both false there - Moqui never creates
+         or alters this table). no-update-stamp is required because that table has no
+         LAST_UPDATED_STAMP column. workOrderId is numeric to match the real column; it is
+         NOT populated via the Oracle identity column (Moqui can't read back DB-generated
+         keys) - see create#WorkOrder, which sequences it explicitly instead. -->
+    <entity entity-name="WorkOrder" package="electrical" group="jde" table-name="WORKORDER" no-update-stamp="true">
+        <field name="workOrderId"     type="number-integer" is-pk="true"/>
+        <field name="workOrderNumber" type="text-short" not-null="true"/>
+        <field name="customerName"    type="text-medium" not-null="true"/>
+        <field name="customerPhone"   type="text-short"/>
+        <field name="title"           type="text-medium" not-null="true"/>
+        <field name="description"     type="text-very-long"/>
+        <field name="status"          type="text-short"/>
+        <field name="priority"        type="text-short"/>
+        <field name="assignedTo"      type="text-medium"/>
+        <field name="scheduledDate"   type="date"/>
+        <field name="completedDate"   type="date"/>
+        <field name="estimatedHours"  type="number-decimal"/>
+        <field name="actualHours"     type="number-decimal"/>
+        <field name="estimatedCost"   type="currency-amount"/>
+        <field name="actualCost"      type="currency-amount"/>
+        <field name="createdDate"     type="date-time"/>
+        <field name="updatedDate"     type="date-time"/>
+    </entity>
+</entities>

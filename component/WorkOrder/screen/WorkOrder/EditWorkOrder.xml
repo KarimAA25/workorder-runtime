@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<screen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://moqui.org/xsd/xml-screen-3.xsd"
+        default-menu-title="Work Order" default-menu-index="1">
+
+    <parameter name="workOrderId" required="true"/>
+
+    <transition name="updateWorkOrder" authz-action="update">
+        <service-call name="electrical.WorkOrderServices.update#WorkOrder"
+                in-map="[workOrderId:workOrderId, customerName:customerName, customerPhone:customerPhone, title:title,
+                    description:description, priority:priority, assignedTo:assignedTo, scheduledDate:scheduledDate,
+                    completedDate:completedDate, estimatedHours:estimatedHours, actualHours:actualHours,
+                    estimatedCost:estimatedCost, actualCost:actualCost]"/>
+        <default-response url="."/></transition>
+    <transition name="updateWorkOrderStatus" authz-action="update">
+        <service-call name="electrical.WorkOrderServices.update#WorkOrderStatus"
+                in-map="[workOrderId:workOrderId, status:newStatus]"/>
+        <default-response url="."/></transition>
+    <transition name="deleteWorkOrder" authz-action="delete">
+        <service-call name="electrical.WorkOrderServices.delete#WorkOrder" in-map="[workOrderId:workOrderId]"/>
+        <default-response url="../FindWorkOrder"/></transition>
+
+    <actions>
+        <service-call name="electrical.WorkOrderServices.get#WorkOrder" out-map="context" in-map="[workOrderId:workOrderId]"/>
+        <set field="status" from="workOrder.status"/>
+    </actions>
+    <widgets>
+        <container-row><row-col md="7">
+            <label text="Work Order ${workOrder.workOrderNumber}" type="h4"/>
+
+            <form-single name="EditWorkOrder" transition="updateWorkOrder" map="workOrder">
+                <field name="workOrderId"><default-field><hidden/></default-field></field>
+                <field name="workOrderNumber"><default-field title="Number"><display/></default-field></field>
+                <field name="status"><default-field title="Status"><display/></default-field></field>
+                <field name="customerName"><default-field title="Customer Name"><text-line/></default-field></field>
+                <field name="customerPhone"><default-field title="Customer Phone"><text-line/></default-field></field>
+                <field name="title"><default-field title="Title"><text-line size="40"/></default-field></field>
+                <field name="description"><default-field title="Description"><text-area rows="6"/></default-field></field>
+                <field name="priority"><default-field title="Priority">
+                    <drop-down allow-empty="false"><option key="LOW"/><option key="NORMAL"/>
+                        <option key="HIGH"/><option key="URGENT"/></drop-down>
+                </default-field></field>
+                <field name="assignedTo"><default-field title="Assigned To"><text-line/></default-field></field>
+                <field name="scheduledDate"><default-field title="Scheduled Date"><date-time type="date"/></default-field></field>
+                <field name="completedDate"><default-field title="Completed Date"><date-time type="date"/></default-field></field>
+                <field name="estimatedHours"><default-field title="Est. Hours"><text-line size="8"/></default-field></field>
+                <field name="actualHours"><default-field title="Actual Hours"><text-line size="8"/></default-field></field>
+                <field name="estimatedCost"><default-field title="Est. Cost"><text-line size="10"/></default-field></field>
+                <field name="actualCost"><default-field title="Actual Cost"><text-line size="10"/></default-field></field>
+                <field name="createdDate"><default-field title="Created"><display/></default-field></field>
+                <field name="updatedDate"><default-field title="Updated"><display/></default-field></field>
+                <field name="submitButton"><default-field title="Update"><submit/></default-field></field>
+
+                <field-layout>
+                    <field-row><field-ref name="workOrderNumber"/><field-ref name="status"/></field-row>
+                    <field-row><field-ref name="customerName"/><field-ref name="customerPhone"/></field-row>
+                    <field-row><field-ref name="title"/></field-row>
+                    <field-row><field-ref name="priority"/><field-ref name="assignedTo"/></field-row>
+                    <field-row><field-ref name="scheduledDate"/><field-ref name="completedDate"/></field-row>
+                    <field-row><field-ref name="estimatedHours"/><field-ref name="actualHours"/></field-row>
+                    <field-row><field-ref name="estimatedCost"/><field-ref name="actualCost"/></field-row>
+                    <field-row><field-ref name="createdDate"/><field-ref name="updatedDate"/></field-row>
+                    <fields-not-referenced/>
+                </field-layout>
+            </form-single>
+        </row-col><row-col md="5">
+            <container-box><box-header title="Status Transitions"/><box-body>
+                <link url="updateWorkOrderStatus" text="Start (In Progress)" btn-type="primary" condition="status == 'OPEN'"
+                        parameter-map="[workOrderId:workOrderId, newStatus:'IN_PROGRESS']"/>
+                <link url="updateWorkOrderStatus" text="Put On Hold" btn-type="warning" condition="status == 'OPEN' || status == 'IN_PROGRESS'"
+                        parameter-map="[workOrderId:workOrderId, newStatus:'ON_HOLD']"/>
+                <link url="updateWorkOrderStatus" text="Cancel" btn-type="danger" condition="status == 'OPEN' || status == 'IN_PROGRESS' || status == 'ON_HOLD'"
+                        parameter-map="[workOrderId:workOrderId, newStatus:'CANCELLED']" confirmation="Cancel Work Order ${workOrderId}?"/>
+                <link url="updateWorkOrderStatus" text="Resume (In Progress)" btn-type="primary" condition="status == 'ON_HOLD'"
+                        parameter-map="[workOrderId:workOrderId, newStatus:'IN_PROGRESS']"/>
+                <link url="updateWorkOrderStatus" text="Complete" btn-type="success" condition="status == 'IN_PROGRESS'"
+                        parameter-map="[workOrderId:workOrderId, newStatus:'COMPLETED']"/>
+            </box-body></container-box>
+
+            <container-box><box-header title="Delete"/><box-body>
+                <link url="deleteWorkOrder" text="Delete Work Order" btn-type="danger"
+                        parameter-map="[workOrderId:workOrderId]" confirmation="Delete Work Order ${workOrderId}? This cannot be undone."/>
+            </box-body></container-box>
+        </row-col></container-row>
+    </widgets>
+</screen>

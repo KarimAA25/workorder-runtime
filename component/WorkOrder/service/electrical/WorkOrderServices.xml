@@ -1,0 +1,238 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<services xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://moqui.org/xsd/service-definition-3.xsd">
+
+    <!-- ===================== Work Order ===================== -->
+
+    <!-- workOrderId is generated with ec.entity.sequencedIdPrimary() + an explicit Long cast,
+         NOT EntityValue.setSequencedIdPrimary(). That method stores the sequencer's raw String
+         output straight into the field with no type coercion, which would bind into Oracle's
+         NUMBER column via PreparedStatement.setString() (an untested path for a numeric PK in
+         this codebase) and leave the workOrderId out-parameter as a String instead of a number.
+         Casting explicitly keeps workOrderId a real Long end to end: typed JDBC bind
+         (ps.setLong), typed out-parameter, and a numeric (not stringly-typed) value in REST
+         JSON responses. Oracle never generates the key - its identity column is unused since
+         Moqui can't read back DB-generated keys. -->
+    <service verb="create" noun="WorkOrder">
+        <in-parameters>
+            <parameter name="customerName" required="true"/>
+            <parameter name="title" required="true"/>
+            <parameter name="customerPhone"/>
+            <parameter name="description"/>
+            <parameter name="status" default-value="OPEN"/>
+            <parameter name="priority" default-value="NORMAL"/>
+            <parameter name="assignedTo"/>
+            <parameter name="scheduledDate" type="Date"/>
+            <parameter name="completedDate" type="Date"/>
+            <parameter name="estimatedHours" type="BigDecimal"/>
+            <parameter name="actualHours" type="BigDecimal"/>
+            
+            <parameter name="estimatedCost" type="BigDecimal"/>
+            <parameter name="actualCost" type="BigDecimal"/>
+            <parameter name="workOrderNumber"/>
+        </in-parameters>
+        <out-parameters>
+            <parameter name="workOrderId" type="Long"/>
+            <parameter name="workOrderNumber"/>
+        </out-parameters>
+        <actions>
+            <service-call name="electrical.WorkOrderServices.validate#WorkOrderFields"
+                    in-map="[status:status, priority:priority, estimatedHours:estimatedHours, actualHours:actualHours,
+                        estimatedCost:estimatedCost, actualCost:actualCost]"/>
+
+            <set field="workOrderId" from="ec.entity.sequencedIdPrimary('electrical.WorkOrder', null, null) as Long"/>
+            <set field="workOrderNumber" from="workOrderNumber ?: ('WO-' + ec.user.nowTimestamp.format('yyyyMMdd') + '-' + workOrderId)"/>
+            <set field="nowTimestamp" from="ec.user.nowTimestamp"/>
+
+            <script><![CDATA[
+                context.newWorkOrderFields = [workOrderId:workOrderId, workOrderNumber:workOrderNumber,
+                        customerName:customerName, customerPhone:customerPhone, title:title, description:description,
+                        status:status, priority:priority, assignedTo:assignedTo, scheduledDate:scheduledDate,
+                        completedDate:completedDate, estimatedHours:estimatedHours, actualHours:actualHours,
+                        estimatedCost:estimatedCost, actualCost:actualCost, createdDate:nowTimestamp, updatedDate:nowTimestamp]
+            ]]></script>
+            <set field="newWorkOrder" from="ec.entity.makeValue('electrical.WorkOrder')"/>
+            <entity-set value-field="newWorkOrder" map="newWorkOrderFields" set-if-empty="true"/>
+            <entity-create value-field="newWorkOrder"/>
+        </actions>
+    </service>
+
+    <!-- Partial update: only fields actually passed by the caller are touched. The in-map
+         handed to the entity-auto update#electrical.WorkOrder below is built with a Groovy
+         map literal that always contains every key (even ones the caller omitted, as null) -
+         passing that straight through would null out every column not included in a PATCH
+         body, since entity-auto only skips a field when its key is genuinely absent from the
+         map, not when present-with-null (see EntityJavaUtil.setFieldsEv: srcContains checks
+         containsKey, not value != null). So untouched fields are filtered out by hand first.
+         workOrderId, workOrderNumber and createdDate are deliberately not accepted as
+         in-parameters here at all, so there's no way to change them through this service. -->
+    <service verb="update" noun="WorkOrder">
+        <in-parameters>
+            <parameter name="workOrderId" required="true" type="Long"/>
+            <parameter name="customerName"/>
+            <parameter name="customerPhone"/>
+            <parameter name="title"/>
+            <parameter name="description"/>
+            <parameter name="status"/>
+            <parameter name="priority"/>
+            <parameter name="assignedTo"/>
+            <parameter name="scheduledDate" type="Date"/>
+            <parameter name="completedDate" type="Date"/>
+            <parameter name="estimatedHours" type="BigDecimal"/>
+            <parameter name="actualHours" type="BigDecimal"/>
+            <parameter name="estimatedCost" type="BigDecimal"/>
+            <parameter name="actualCost" type="BigDecimal"/>
+        </in-parameters>
+        <actions>
+            <entity-find-one entity-name="electrical.WorkOrder" value-field="existing">
+                <field-map field-name="workOrderId"/></entity-find-one>
+            <if condition="existing == null">
+                <return error="true" message="Work Order ${workOrderId} not found"/></if>
+
+            <service-call name="electrical.WorkOrderServices.validate#WorkOrderFields"
+                    in-map="[status:status, priority:priority, estimatedHours:estimatedHours, actualHours:actualHours,
+                        estimatedCost:estimatedCost, actualCost:actualCost]"/>
+
+            <script><![CDATA[
+                Map<String, Object> updateFields = [customerName:customerName, customerPhone:customerPhone, title:title,
+                        description:description, status:status, priority:priority, assignedTo:assignedTo,
+                        scheduledDate:scheduledDate, completedDate:completedDate, estimatedHours:estimatedHours,
+                        actualHours:actualHours, estimatedCost:estimatedCost, actualCost:actualCost]
+                updateFields = updateFields.findAll { it.value != null }
+                updateFields.workOrderId = workOrderId
+                updateFields.updatedDate = ec.user.nowTimestamp
+                context.updateFields = updateFields
+            ]]></script>
+
+            <service-call name="update#electrical.WorkOrder" in-map="updateFields"/>
+        </actions>
+    </service>
+
+    <service verb="get" noun="WorkOrder">
+        <in-parameters><parameter name="workOrderId" required="true" type="Long"/></in-parameters>
+        <out-parameters><parameter name="workOrder" type="Map"/></out-parameters>
+        <actions>
+            <entity-find-one entity-name="electrical.WorkOrder" value-field="workOrder">
+                <field-map field-name="workOrderId"/></entity-find-one>
+            <if condition="workOrder == null">
+                <return error="true" message="Work Order ${workOrderId} not found"/></if>
+        </actions>
+    </service>
+
+    <service verb="find" noun="WorkOrders">
+        <in-parameters>
+            <parameter name="status"/>
+            <parameter name="priority"/>
+            <parameter name="assignedTo"/>
+            <parameter name="customerName"/>
+            <parameter name="scheduledDateFrom" type="Date"/>
+            <parameter name="scheduledDateThru" type="Date"/>
+            <parameter name="pageIndex" type="Integer" default="0"/>
+            <parameter name="pageSize" type="Integer" default="20"/>
+            <parameter name="orderByField" default-value="-createdDate"/>
+        </in-parameters>
+        <out-parameters>
+            <parameter name="workOrderList" type="List"/>
+            <parameter name="totalCount" type="Long"/>
+        </out-parameters>
+        <actions>
+            <set field="customerNameLike" from="customerName ? ('%' + customerName + '%') : null"/>
+
+            <entity-find-count entity-name="electrical.WorkOrder" count-field="totalCount">
+                <econdition field-name="status" ignore-if-empty="true"/>
+                <econdition field-name="priority" ignore-if-empty="true"/>
+                <econdition field-name="assignedTo" ignore-if-empty="true"/>
+                <econdition field-name="customerName" operator="like" from="customerNameLike" ignore-case="true" ignore-if-empty="true"/>
+                <econdition field-name="scheduledDate" operator="greater-equals" from="scheduledDateFrom" ignore-if-empty="true"/>
+                <econdition field-name="scheduledDate" operator="less-equals" from="scheduledDateThru" ignore-if-empty="true"/>
+            </entity-find-count>
+
+            <entity-find entity-name="electrical.WorkOrder" list="workOrderList"
+                    offset="pageIndex * pageSize" limit="pageSize">
+                <econdition field-name="status" ignore-if-empty="true"/>
+                <econdition field-name="priority" ignore-if-empty="true"/>
+                <econdition field-name="assignedTo" ignore-if-empty="true"/>
+                <econdition field-name="customerName" operator="like" from="customerNameLike" ignore-case="true" ignore-if-empty="true"/>
+                <econdition field-name="scheduledDate" operator="greater-equals" from="scheduledDateFrom" ignore-if-empty="true"/>
+                <econdition field-name="scheduledDate" operator="less-equals" from="scheduledDateThru" ignore-if-empty="true"/>
+                <order-by field-name="${orderByField}"/>
+            </entity-find>
+        </actions>
+    </service>
+
+    <!-- Hardcoded transition table (not StatusItem/StatusFlowTransition - status is a plain
+         text column on the pre-existing Oracle table, not a Moqui-managed statusId). COMPLETED
+         and CANCELLED have no entries, i.e. no outbound transitions - both are final. -->
+    <service verb="update" noun="WorkOrderStatus">
+        <in-parameters>
+            <parameter name="workOrderId" required="true" type="Long"/>
+            <parameter name="status" required="true"/>
+        </in-parameters>
+        <actions>
+            <if condition="!(status in ['OPEN', 'IN_PROGRESS', 'ON_HOLD', 'COMPLETED', 'CANCELLED'])">
+                <return error="true" message="Invalid status '${status}'; must be one of OPEN, IN_PROGRESS, ON_HOLD, COMPLETED, CANCELLED"/></if>
+
+            <entity-find-one entity-name="electrical.WorkOrder" value-field="workOrder">
+                <field-map field-name="workOrderId"/></entity-find-one>
+            <if condition="workOrder == null">
+                <return error="true" message="Work Order ${workOrderId} not found"/></if>
+
+            <set field="allowedTransitions" from="[
+                    OPEN:['IN_PROGRESS', 'ON_HOLD', 'CANCELLED'],
+                    IN_PROGRESS:['ON_HOLD', 'COMPLETED', 'CANCELLED'],
+                    ON_HOLD:['IN_PROGRESS', 'CANCELLED'],
+                    COMPLETED:[],
+                    CANCELLED:[]]"/>
+            <if condition="!(allowedTransitions[workOrder.status] ?: []).contains(status)">
+                <return error="true" message="Cannot transition Work Order ${workOrderId} from ${workOrder.status} to ${status}"/></if>
+
+            <set field="workOrder.status" from="status"/>
+            <if condition="status == 'COMPLETED' &amp;&amp; !workOrder.completedDate">
+                <set field="workOrder.completedDate" from="new java.sql.Date(ec.user.nowTimestamp.getTime())"/></if>
+            <set field="workOrder.updatedDate" from="ec.user.nowTimestamp"/>
+            <entity-update value-field="workOrder"/>
+        </actions>
+    </service>
+
+    <service verb="delete" noun="WorkOrder">
+        <in-parameters><parameter name="workOrderId" required="true" type="Long"/></in-parameters>
+        <actions>
+            <entity-find-one entity-name="electrical.WorkOrder" value-field="workOrder">
+                <field-map field-name="workOrderId"/></entity-find-one>
+            <if condition="workOrder == null">
+                <return error="true" message="Work Order ${workOrderId} not found"/></if>
+            <entity-delete value-field="workOrder"/>
+        </actions>
+    </service>
+
+    <!-- Shared validation, called by create#WorkOrder and update#WorkOrder. Accumulates every
+         problem via ec.message.addError (rather than failing on the first one) so a REST PATCH
+         with several bad fields gets one response listing all of them, then check-errors halts
+         the service if anything was added. All inputs are optional here since update#WorkOrder
+         only passes fields that were actually provided. -->
+    <service verb="validate" noun="WorkOrderFields">
+        <in-parameters>
+            <parameter name="status"/>
+            <parameter name="priority"/>
+            <parameter name="estimatedHours" type="BigDecimal"/>
+            <parameter name="actualHours" type="BigDecimal"/>
+            <parameter name="estimatedCost" type="BigDecimal"/>
+            <parameter name="actualCost" type="BigDecimal"/>
+        </in-parameters>
+        <actions>
+            <if condition="status != null &amp;&amp; !(status in ['OPEN', 'IN_PROGRESS', 'ON_HOLD', 'COMPLETED', 'CANCELLED'])">
+                <script>ec.message.addError("Invalid status '${status}'; must be one of OPEN, IN_PROGRESS, ON_HOLD, COMPLETED, CANCELLED".toString())</script></if>
+            <if condition="priority != null &amp;&amp; !(priority in ['LOW', 'NORMAL', 'HIGH', 'URGENT'])">
+                <script>ec.message.addError("Invalid priority '${priority}'; must be one of LOW, NORMAL, HIGH, URGENT".toString())</script></if>
+            <if condition="estimatedHours != null &amp;&amp; estimatedHours.signum() &lt; 0">
+                <script>ec.message.addError("estimatedHours must be >= 0")</script></if>
+            <if condition="actualHours != null &amp;&amp; actualHours.signum() &lt; 0">
+                <script>ec.message.addError("actualHours must be >= 0")</script></if>
+            <if condition="estimatedCost != null &amp;&amp; estimatedCost.signum() &lt; 0">
+                <script>ec.message.addError("estimatedCost must be >= 0")</script></if>
+            <if condition="actualCost != null &amp;&amp; actualCost.signum() &lt; 0">
+                <script>ec.message.addError("actualCost must be >= 0")</script></if>
+            <check-errors/>
+        </actions>
+    </service>
+
+</services>

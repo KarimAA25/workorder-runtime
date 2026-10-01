@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Demo password for all users below is "moqui" (same SHA hash used throughout the
+     other demo data in this install, e.g. mantle-usl/data/ZbaOrganizationDemoData.xml). -->
+<entity-facade-xml type="demo">
+
+    <!-- Dispatcher -->
+    <mantle.party.Party partyId="ES_DISPATCH1" partyTypeEnumId="PtyPerson"/>
+    <mantle.party.Person partyId="ES_DISPATCH1" firstName="Dana" lastName="Dispatcher"/>
+    <mantle.party.PartyRole partyId="ES_DISPATCH1" roleTypeId="Employee"/>
+    <moqui.security.UserAccount userId="ES_DISPATCH1" username="es.dispatcher" userFullName="Dana Dispatcher"
+            currentPassword="16ac58bbfa332c1c55bd98b53e60720bfa90d394" passwordHashType="SHA"
+            passwordHint="framework name, lowercase" currencyUomId="USD" locale="en_US" timeZone="US/Eastern"
+            partyId="ES_DISPATCH1"/>
+    <moqui.security.UserGroupMember userGroupId="ES_DISPATCHER" userId="ES_DISPATCH1" fromDate="1265184000000"/>
+
+    <!-- Technicians -->
+    <mantle.party.Party partyId="ES_TECH1" partyTypeEnumId="PtyPerson"/>
+    <mantle.party.Person partyId="ES_TECH1" firstName="Tariq" lastName="Technician"/>
+    <mantle.party.PartyRole partyId="ES_TECH1" roleTypeId="Employee"/>
+    <mantle.party.PartyRole partyId="ES_TECH1" roleTypeId="Worker"/>
+    <moqui.security.UserAccount userId="ES_TECH1" username="es.tech1" userFullName="Tariq Technician"
+            currentPassword="16ac58bbfa332c1c55bd98b53e60720bfa90d394" passwordHashType="SHA"
+            passwordHint="framework name, lowercase" currencyUomId="USD" locale="en_US" timeZone="US/Eastern"
+            partyId="ES_TECH1"/>
+    <moqui.security.UserGroupMember userGroupId="ES_TECHNICIAN" userId="ES_TECH1" fromDate="1265184000000"/>
+
+    <mantle.party.Party partyId="ES_TECH2" partyTypeEnumId="PtyPerson"/>
+    <mantle.party.Person partyId="ES_TECH2" firstName="Tala" lastName="Technician"/>
+    <mantle.party.PartyRole partyId="ES_TECH2" roleTypeId="Employee"/>
+    <mantle.party.PartyRole partyId="ES_TECH2" roleTypeId="Worker"/>
+    <moqui.security.UserAccount userId="ES_TECH2" username="es.tech2" userFullName="Tala Technician"
+            currentPassword="16ac58bbfa332c1c55bd98b53e60720bfa90d394" passwordHashType="SHA"
+            passwordHint="framework name, lowercase" currencyUomId="USD" locale="en_US" timeZone="US/Eastern"
+            partyId="ES_TECH2"/>
+    <moqui.security.UserGroupMember userGroupId="ES_TECHNICIAN" userId="ES_TECH2" fromDate="1265184000000"/>
+
+    <!-- Customers -->
+    <mantle.party.Party partyId="ES_CUST1" partyTypeEnumId="PtyPerson"/>
+    <mantle.party.Person partyId="ES_CUST1" firstName="Karim" lastName="Customer"/>
+    <mantle.party.PartyRole partyId="ES_CUST1" roleTypeId="Customer"/>
+    <moqui.security.UserAccount userId="ES_CUST1" username="es.customer1" userFullName="Karim Customer"
+            currentPassword="16ac58bbfa332c1c55bd98b53e60720bfa90d394" passwordHashType="SHA"
+            passwordHint="framework name, lowercase" currencyUomId="USD" locale="en_US" timeZone="US/Eastern"
+            partyId="ES_CUST1"/>
+
+    <mantle.party.Party partyId="ES_CUST2" partyTypeEnumId="PtyPerson"/>
+    <mantle.party.Person partyId="ES_CUST2" firstName="Sara" lastName="Customer"/>
+    <mantle.party.PartyRole partyId="ES_CUST2" roleTypeId="Customer"/>
+    <moqui.security.UserAccount userId="ES_CUST2" username="es.customer2" userFullName="Sara Customer"
+            currentPassword="16ac58bbfa332c1c55bd98b53e60720bfa90d394" passwordHashType="SHA"
+            passwordHint="framework name, lowercase" currencyUomId="USD" locale="en_US" timeZone="US/Eastern"
+            partyId="ES_CUST2"/>
+
+</entity-facade-xml>

@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<screen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://moqui.org/xsd/xml-screen-3.xsd"
+        default-menu-title="Service Visits" default-menu-index="2" menu-image="fa fa-truck" menu-image-type="icon">
+    <subscreens default-item="FindServiceVisit">
+        <subscreens-item name="FindServiceVisit" menu-include="false"
+                location="component://ElectricalService/screen/ElectricalServiceRoot/ServiceVisits/FindServiceVisit.xml"/>
+        <subscreens-item name="ViewServiceVisit" menu-include="false"
+                location="component://ElectricalService/screen/ElectricalServiceRoot/ServiceVisits/ViewServiceVisit.xml"/>
+    </subscreens>
+    <widgets><subscreens-panel id="ServiceVisitsPanel" type="tab"/></widgets>
+</screen>

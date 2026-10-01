@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<screen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://moqui.org/xsd/xml-screen-3.xsd"
+        default-menu-include="false">
+
+    <transition name="findServiceVisit"><default-response url="."/></transition>
+    <transition name="viewServiceVisit"><default-response url="../ViewServiceVisit"/></transition>
+
+    <transition-include name="searchPartyList" location="component://SimpleScreens/template/party/PartyForms.xml"/>
+
+    <widgets>
+        <form-list name="ListServiceVisits" list="serviceVisitList" skip-form="true" header-dialog="true"
+                select-columns="true" saved-finds="true" show-page-size="true">
+            <entity-find entity-name="ElectricalService.ElectricalServiceVisitDetail" list="serviceVisitList">
+                <econdition field-name="workEffortTypeEnumId" value="WetElecVisit"/>
+                <search-form-inputs default-order-by="-scheduledDate"/>
+            </entity-find>
+
+            <field name="statusId">
+                <header-field title="Status" show-order-by="true">
+                    <widget-template-include location="component://webroot/template/screen/BasicWidgetTemplates.xml#statusDropDown">
+                        <set field="statusTypeId" value="ElecServiceVisit"/><set field="allowEmpty" value="true"/></widget-template-include>
+                </header-field>
+                <default-field><display-entity entity-name="moqui.basic.StatusItem"/></default-field>
+            </field>
+            <field name="serviceVisitId">
+                <header-field title="Visit ID"><text-find size="10" hide-options="true"/></header-field>
+                <default-field><link url="viewServiceVisit" text="${serviceVisitId}" link-type="anchor"/></default-field>
+            </field>
+            <field name="serviceRequestId">
+                <header-field title="Request ID"><text-find size="10" hide-options="true"/></header-field>
+                <default-field><link url="../../ServiceRequests/EditServiceRequest" text="${serviceRequestId}" link-type="anchor"/></default-field>
+            </field>
+            <field name="technicianPartyId">
+                <header-field title="Technician"><drop-down allow-empty="true">
+                    <dynamic-options transition="searchPartyList" server-search="true" min-length="2" parameter-map="[roleTypeId:'Worker']"/>
+                </drop-down></header-field>
+                <default-field><display-entity entity-name="mantle.party.PartyDetail" text="PartyNameTemplate"/></default-field>
+            </field>
+            <field name="scheduledDate">
+                <header-field title="Scheduled" show-order-by="true"><date-period allow-empty="true"/></header-field>
+                <default-field><display/></default-field>
+            </field>
+            <field name="startTime"><default-field title="Started"><display/></default-field></field>
+            <field name="endTime"><default-field title="Ended"><display/></default-field></field>
+
+            <field name="submitButton"><header-field title="Find"><submit/></header-field></field>
+
+            <form-list-column><field-ref name="serviceVisitId"/><field-ref name="serviceRequestId"/></form-list-column>
+            <form-list-column><field-ref name="statusId"/></form-list-column>
+            <form-list-column><field-ref name="technicianPartyId"/></form-list-column>
+            <form-list-column><field-ref name="scheduledDate"/><field-ref name="startTime"/><field-ref name="endTime"/></form-list-column>
+        </form-list>
+    </widgets>
+</screen>

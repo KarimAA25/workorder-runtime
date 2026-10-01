@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<screen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://moqui.org/xsd/xml-screen-3.xsd"
+        default-menu-title="Dashboard" default-menu-index="1" menu-image="fa fa-dashboard" menu-image-type="icon">
+    <widgets>
+        <section name="QuickInfoSection"><actions>
+            <entity-find-count entity-name="ElectricalService.ElectricalServiceRequestDetail" count-field="openCount">
+                <econdition field-name="requestTypeEnumId" value="RtElecService"/>
+                <econdition field-name="statusId" value="EsrOpen"/></entity-find-count>
+            <entity-find-count entity-name="ElectricalService.ElectricalServiceRequestDetail" count-field="assignedCount">
+                <econdition field-name="requestTypeEnumId" value="RtElecService"/>
+                <econdition field-name="statusId" value="EsrAssigned"/></entity-find-count>
+            <entity-find-count entity-name="ElectricalService.ElectricalServiceVisitDetail" count-field="scheduledCount">
+                <econdition field-name="workEffortTypeEnumId" value="WetElecVisit"/>
+                <econdition field-name="statusId" value="EsvScheduled"/></entity-find-count>
+            <entity-find-count entity-name="ElectricalService.ElectricalServiceVisitDetail" count-field="inProgressCount">
+                <econdition field-name="workEffortTypeEnumId" value="WetElecVisit"/>
+                <econdition field-name="statusId" value="EsvInProgress"/></entity-find-count>
+            <entity-find-count entity-name="ElectricalService.ElectricalServiceRequestDetail" count-field="completedCount">
+                <econdition field-name="requestTypeEnumId" value="RtElecService"/>
+                <econdition field-name="statusId" value="EsrCompleted"/></entity-find-count>
+        </actions><widgets>
+            <container style="shaded-area condensed" type="span">
+                <link url="../ServiceRequests/FindServiceRequest" parameter-map="[statusId:'EsrOpen']"
+                        text="Open##Requests" badge="${openCount}" btn-type="default"/>
+                <link url="../ServiceRequests/FindServiceRequest" parameter-map="[statusId:'EsrAssigned']"
+                        text="Assigned##Requests" badge="${assignedCount}" btn-type="default"/>
+                <link url="../ServiceVisits/FindServiceVisit" parameter-map="[statusId:'EsvScheduled']"
+                        text="Scheduled##Visits" badge="${scheduledCount}" btn-type="default"/>
+                <link url="../ServiceVisits/FindServiceVisit" parameter-map="[statusId:'EsvInProgress']"
+                        text="In Progress##Visits" badge="${inProgressCount}" btn-type="default"/>
+                <link url="../ServiceRequests/FindServiceRequest" parameter-map="[statusId:'EsrCompleted']"
+                        text="Completed##Requests" badge="${completedCount}" btn-type="default"/>
+            </container>
+        </widgets></section>
+    </widgets>
+</screen>

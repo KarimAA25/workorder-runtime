@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<screen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://moqui.org/xsd/xml-screen-3.xsd"
+        default-menu-title="Work Orders" menu-image="fa fa-wrench" menu-image-type="icon">
+    <always-actions>
+        <set field="appRoot" value="workorder"/>
+    </always-actions>
+    <subscreens default-item="FindWorkOrder" always-use-full-path="true">
+        <subscreens-item name="FindWorkOrder" menu-include="false"
+                location="component://WorkOrder/screen/WorkOrder/FindWorkOrder.xml"/>
+        <subscreens-item name="EditWorkOrder" menu-include="false"
+                location="component://WorkOrder/screen/WorkOrder/EditWorkOrder.xml"/>
+    </subscreens>
+    <widgets>
+        <subscreens-panel id="WorkOrderPanel" type="tab"/>
+    </widgets>
+</screen>

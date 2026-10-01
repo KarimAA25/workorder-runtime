@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<entity-facade-xml type="seed">
+
+    <!-- Whole app screen tree, REST root, and all WorkOrder services, ADMIN only (test
+         component - no other user groups defined). Follows the same pattern as
+         ElectricalService's data/ElectricalServiceAaaSeedData.xml: AT_SERVICE is granted
+         separately from AT_XML_SCREEN because a screen-tree grant only cascades to a service
+         when that service is reached *through* an authorized screen/transition on the
+         execution stack - REST calls have no screen ancestor, so the service needs its own
+         authz entry independent of the screen tree. -->
+    <moqui.security.ArtifactGroup artifactGroupId="WO_APP" description="Work Order App (screens, REST root, services)"/>
+    <moqui.security.ArtifactGroupMember artifactGroupId="WO_APP" artifactTypeEnumId="AT_XML_SCREEN"
+            artifactName="component://WorkOrder/screen/WorkOrder.xml" inheritAuthz="Y"/>
+    <moqui.security.ArtifactGroupMember artifactGroupId="WO_APP" artifactTypeEnumId="AT_REST_PATH"
+            artifactName="/workorder/.*" nameIsPattern="Y" inheritAuthz="Y"/>
+    <moqui.security.ArtifactGroupMember artifactGroupId="WO_APP" artifactTypeEnumId="AT_SERVICE"
+            artifactName="electrical.WorkOrderServices\..*" nameIsPattern="Y" inheritAuthz="Y"/>
+
+    <!-- ADMIN does not automatically get access to a custom app's screens/services without
+         this; without it the app tile does not even appear on AppList. -->
+    <moqui.security.ArtifactAuthz artifactAuthzId="WO_APP_ADMIN" userGroupId="ADMIN" artifactGroupId="WO_APP"
+            authzTypeEnumId="AUTHZT_ALWAYS" authzActionEnumId="AUTHZA_ALL"/>
+
+</entity-facade-xml>

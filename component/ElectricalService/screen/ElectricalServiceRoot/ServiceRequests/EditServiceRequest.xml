@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<screen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://moqui.org/xsd/xml-screen-3.xsd"
+        default-menu-title="Service Request" default-menu-index="1">
+
+    <parameter name="serviceRequestId" required="true"/>
+
+    <transition name="updateServiceRequest" authz-action="update">
+        <service-call name="ElectricalService.ElectricalServiceServices.update#ServiceRequest"/>
+        <default-response url="."/></transition>
+    <transition name="assignTechnician" authz-action="update">
+        <service-call name="ElectricalService.ElectricalServiceServices.assign#Technician"/>
+        <default-response url="."/></transition>
+    <transition name="scheduleVisit" authz-action="update">
+        <service-call name="ElectricalService.ElectricalServiceServices.schedule#Visit"/>
+        <default-response url="../../ServiceVisits/ViewServiceVisit" parameter-map="[serviceVisitId:serviceVisitId]"/></transition>
+    <transition name="closeServiceRequest" authz-action="update">
+        <service-call name="ElectricalService.ElectricalServiceServices.close#ServiceRequest"/>
+        <default-response url="."/></transition>
+
+    <transition-include name="searchPartyList" location="component://SimpleScreens/template/party/PartyForms.xml"/>
+
+    <actions>
+        <entity-find-one entity-name="ElectricalService.ElectricalServiceRequestDetail" value-field="serviceRequest">
+            <field-map field-name="serviceRequestId"/></entity-find-one>
+        <if condition="serviceRequest == null"><return error="true" message="Service Request ${serviceRequestId} not found"/></if>
+        <set field="statusId" from="serviceRequest.statusId"/>
+        <set field="changedEntityName" value="mantle.request.Request"/>
+        <set field="pkPrimaryValue" from="serviceRequestId"/>
+
+        <entity-find entity-name="ElectricalService.ElectricalServiceVisitDetail" list="visitList">
+            <econdition field-name="serviceRequestId"/><order-by field-name="-scheduledDate"/></entity-find>
+    </actions>
+    <widgets>
+        <container-row><row-col md="7">
+            <label text="Service Request #${serviceRequestId}" type="h4"/>
+
+            <form-single name="EditServiceRequest" transition="updateServiceRequest" map="serviceRequest">
+                <field name="serviceRequestId"><default-field title="Request ID"><display/></default-field></field>
+                <field name="requestedDate"><default-field title="Requested"><display/></default-field></field>
+                <field name="customerPartyId"><default-field title="Customer">
+                    <display-entity entity-name="mantle.party.PartyDetail" text="PartyNameTemplate"/></default-field></field>
+                <field name="technicianPartyId"><default-field title="Technician">
+                    <display-entity entity-name="mantle.party.PartyDetail" text="PartyNameTemplate"/></default-field></field>
+                <field name="priority"><default-field>
+                    <drop-down allow-empty="true"><option key="1"/><option key="2"/><option key="3"/><option key="4"/>
+                        <option key="5"/><option key="6"/><option key="7"/><option key="8"/><option key="9"/></drop-down>
+                </default-field></field>
+                <field name="description"><default-field><text-area rows="10"/></default-field></field>
+                <field name="submitButton"><default-field title="Update"><submit/></default-field></field>
+
+                <field-layout>
+                    <field-row><field-ref name="serviceRequestId"/><field-ref name="requestedDate"/></field-row>
+                    <field-row><field-ref name="customerPartyId"/><field-ref name="technicianPartyId"/></field-row>
+                    <field-row><field-ref name="priority"/></field-row>
+                    <fields-not-referenced/>
+                </field-layout>
+            </form-single>
+
+            <container-box condition="visitList"><box-header title="Visits"/><box-body-nopad>
+                <form-list name="RequestVisitList" list="visitList" skip-form="true">
+                    <field name="serviceVisitId"><default-field title="Visit">
+                        <link url="../../ServiceVisits/ViewServiceVisit" text="${serviceVisitId}" link-type="anchor"/></default-field></field>
+                    <field name="scheduledDate"><default-field title="Scheduled"><display/></default-field></field>
+                    <field name="statusId"><default-field title="Status"><display-entity entity-name="moqui.basic.StatusItem"/></default-field></field>
+                </form-list>
+            </box-body-nopad></container-box>
+        </row-col><row-col md="5">
+            <section-include name="StatusHistorySection" location="component://SimpleScreens/template/basic/StatusWidgets.xml"/>
+
+            <container-box><box-header title="Workflow Actions"/><box-body>
+                <container-dialog id="AssignTechnicianDialog" button-text="Assign Technician"
+                        condition="statusId == 'EsrOpen' || statusId == 'EsrAssigned'">
+                    <form-single name="AssignTechnicianForm" transition="assignTechnician">
+                        <field name="serviceRequestId"><default-field><hidden/></default-field></field>
+                        <field name="technicianPartyId"><default-field title="Technician">
+                            <drop-down allow-empty="false"><dynamic-options transition="searchPartyList" server-search="true"
+                                    min-length="2" parameter-map="[roleTypeId:'Worker']"/></drop-down>
+                        </default-field></field>
+                        <field name="submitButton"><default-field title="Assign"><submit/></default-field></field>
+                    </form-single>
+                </container-dialog>
+
+                <container-dialog id="ScheduleVisitDialog" button-text="Schedule Visit" condition="statusId == 'EsrAssigned'">
+                    <form-single name="ScheduleVisitForm" transition="scheduleVisit">
+                        <field name="serviceRequestId"><default-field><hidden/></default-field></field>
+                        <field name="scheduledDate"><default-field title="Scheduled Date/Time"><date-time type="date-time"/></default-field></field>
+                        <field name="submitButton"><default-field title="Schedule"><submit/></default-field></field>
+                    </form-single>
+                </container-dialog>
+
+                <link url="closeServiceRequest" text="Close Request" btn-type="success" condition="statusId == 'EsrCompleted'"
+                        parameter-map="[serviceRequestId:serviceRequestId]" confirmation="Close Service Request ${serviceRequestId}?"/>
+            </box-body></container-box>
+        </row-col></container-row>
+    </widgets>
+</screen>

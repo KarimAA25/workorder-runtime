@@ -10,6 +10,9 @@
     <default-property name="entity_empty_db_load" value="all"/>
     <default-property name="entity_lock_track" value="true"/>
 
+    <default-property name="jde_db_user" value="MoquiTest"/>
+    <default-property name="jde_db_password" value="moqui123" is-secret="true"/>
+
     <!-- minimal overrides for testing on local mysql8:
     <default-property name="entity_ds_db_conf" value="mysql8"/>
     <default-property name="entity_ds_user" value="root"/>
@@ -83,7 +86,13 @@
     </screen-facade>
 
     <entity-facade query-stats="true">
-        <!-- add datasource elements here to configure databases -->
+        <datasource group-name="jde" database-conf-name="oracle" schema-name="MOQUITEST"
+                    runtime-add-missing="false" startup-add-missing="false">
+            <inline-jdbc pool-minsize="2" pool-maxsize="20">
+                <xa-properties user="${jde_db_user}" password="${jde_db_password}"
+                               URL="jdbc:oracle:thin:@//ENTUMB92:1521/JDEDB"/>
+            </inline-jdbc>
+        </datasource>
     </entity-facade>
 
     <repository-list>

@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<entity-facade-xml type="seed">
+
+    <!-- ===================== Enumerations (tagging Mantle's shared Request/WorkEffort
+         records as electrical-service ones; EnumerationType parents already seeded by
+         mantle-udm, only adding our child values here) ===================== -->
+    <moqui.basic.Enumeration enumId="RtElecService" description="Electrical Service" enumTypeId="RequestType"/>
+    <moqui.basic.Enumeration enumId="WetElecVisit" description="Electrical Service Visit" enumTypeId="WorkEffortType"/>
+
+    <!-- ===================== Service Request status flow (on mantle.request.Request.statusId) ===================== -->
+    <moqui.basic.StatusType statusTypeId="ElecServiceRequest" description="Electrical Service Request Status"/>
+    <moqui.basic.StatusItem statusId="EsrOpen" statusTypeId="ElecServiceRequest" sequenceNum="1" description="Open"/>
+    <moqui.basic.StatusItem statusId="EsrAssigned" statusTypeId="ElecServiceRequest" sequenceNum="2" description="Assigned"/>
+    <moqui.basic.StatusItem statusId="EsrScheduled" statusTypeId="ElecServiceRequest" sequenceNum="3" description="Scheduled"/>
+    <moqui.basic.StatusItem statusId="EsrInProgress" statusTypeId="ElecServiceRequest" sequenceNum="4" description="In Progress"/>
+    <moqui.basic.StatusItem statusId="EsrCompleted" statusTypeId="ElecServiceRequest" sequenceNum="5" description="Completed"/>
+    <moqui.basic.StatusItem statusId="EsrClosed" statusTypeId="ElecServiceRequest" sequenceNum="6" description="Closed"/>
+    <moqui.basic.StatusFlowTransition statusFlowId="Default" statusId="EsrOpen" toStatusId="EsrAssigned" transitionName="Assign Technician"/>
+    <moqui.basic.StatusFlowTransition statusFlowId="Default" statusId="EsrAssigned" toStatusId="EsrScheduled" transitionName="Schedule Visit"/>
+    <moqui.basic.StatusFlowTransition statusFlowId="Default" statusId="EsrScheduled" toStatusId="EsrInProgress" transitionName="Start Visit"/>
+    <moqui.basic.StatusFlowTransition statusFlowId="Default" statusId="EsrInProgress" toStatusId="EsrCompleted" transitionName="Complete Visit"/>
+    <moqui.basic.StatusFlowTransition statusFlowId="Default" statusId="EsrCompleted" toStatusId="EsrClosed" transitionName="Close Request"/>
+
+    <!-- ===================== Service Visit status flow (on mantle.work.effort.WorkEffort.statusId) ===================== -->
+    <moqui.basic.StatusType statusTypeId="ElecServiceVisit" description="Electrical Service Visit Status"/>
+    <moqui.basic.StatusItem statusId="EsvScheduled" statusTypeId="ElecServiceVisit" sequenceNum="1" description="Scheduled"/>
+    <moqui.basic.StatusItem statusId="EsvInProgress" statusTypeId="ElecServiceVisit" sequenceNum="2" description="In Progress"/>
+    <moqui.basic.StatusItem statusId="EsvCompleted" statusTypeId="ElecServiceVisit" sequenceNum="3" description="Completed"/>
+    <moqui.basic.StatusFlowTransition statusFlowId="Default" statusId="EsvScheduled" toStatusId="EsvInProgress" transitionName="Start Visit"/>
+    <moqui.basic.StatusFlowTransition statusFlowId="Default" statusId="EsvInProgress" toStatusId="EsvCompleted" transitionName="Complete Visit"/>
+
+    <!-- ===================== Security: UserGroups ===================== -->
+    <moqui.security.UserGroup userGroupId="ES_DISPATCHER" description="Electrical Service Dispatcher"/>
+    <moqui.security.UserGroup userGroupId="ES_TECHNICIAN" description="Electrical Service Technician"/>
+
+    <!-- Whole app screen tree, REST root, and all ElectricalService services: both groups can
+         reach these; the *action* each group is granted (ALL vs VIEW, below) is what actually
+         differs. The AT_SERVICE member is required in addition to the AT_XML_SCREEN one: a
+         screen-tree ALWAYS+ALL grant only cascades to a service when that service is reached
+         *through* an authorized screen/transition on the execution stack (inheritance runs down
+         the stack, see ArtifactExecutionFacadeImpl.isPermitted). REST calls and any direct
+         service call (as in the Spock tests here) have no screen ancestor, so the service needs
+         its own authz entry independent of the screen tree. -->
+    <moqui.security.ArtifactGroup artifactGroupId="ES_APP" description="Electrical Service App (screens, REST root, services)"/>
+    <moqui.security.ArtifactGroupMember artifactGroupId="ES_APP" artifactTypeEnumId="AT_XML_SCREEN"
+            artifactName="component://ElectricalService/screen/ElectricalServiceRoot.xml" inheritAuthz="Y"/>
+    <moqui.security.ArtifactGroupMember artifactGroupId="ES_APP" artifactTypeEnumId="AT_REST_PATH"
+            artifactName="/electricalService/.*" nameIsPattern="Y" inheritAuthz="Y"/>
+    <moqui.security.ArtifactGroupMember artifactGroupId="ES_APP" artifactTypeEnumId="AT_SERVICE"
+            artifactName="ElectricalService\.ElectricalServiceServices\..*" nameIsPattern="Y" inheritAuthz="Y"/>
+
+    <!-- ADMIN: full access, same as every other app component in this install explicitly
+         grants its own ADMIN access (e.g. HiveMind's HIVE_MIND_PM_ADMIN) - ADMIN does not
+         automatically get access to a custom app's screens/services without this; without
+         it the app tile does not even appear on AppList (AppList.xml only renders a tile
+         when currentUrlInstance.isPermitted() is true for the current user). -->
+    <moqui.security.ArtifactAuthz artifactAuthzId="ES_APP_ADMIN" userGroupId="ADMIN" artifactGroupId="ES_APP"
+            authzTypeEnumId="AUTHZT_ALWAYS" authzActionEnumId="AUTHZA_ALL"/>
+
+    <!-- Dispatcher: full access to the app (create/view/update requests, assign technicians,
+         schedule visits, close requests) - same ALWAYS+ALL inherit-all pattern used for
+         ADMIN on the Tools/System app roots. -->
+    <moqui.security.ArtifactAuthz artifactAuthzId="ES_APP_DISPATCHER" userGroupId="ES_DISPATCHER" artifactGroupId="ES_APP"
+            authzTypeEnumId="AUTHZT_ALWAYS" authzActionEnumId="AUTHZA_ALL"/>
+
+    <!-- Technician: view only, and (via the filter below) view only requests/visits they are
+         assigned to. Mutating actions are granted narrowly below (ES_TECHNICIAN_ACTIONS). -->
+    <moqui.security.ArtifactAuthz artifactAuthzId="ES_APP_TECHNICIAN" userGroupId="ES_TECHNICIAN" artifactGroupId="ES_APP"
+            authzTypeEnumId="AUTHZT_ALWAYS" authzActionEnumId="AUTHZA_VIEW"/>
+
+    <!-- Record-level "only my records" filter attached to the Technician VIEW grant above.
+         Applies whenever these entities are queried (directly, or as part of a view-entity
+         that aliases the filtered field). -->
+    <moqui.security.EntityFilterSet entityFilterSetId="ES_TECHNICIAN_OWN" description="Electrical Service: only own assigned records"/>
+    <moqui.security.EntityFilter entityFilterId="ES_TECH_OWN_REQ" entityFilterSetId="ES_TECHNICIAN_OWN"
+            entityName="ElectricalService.ElectricalServiceRequestDetail"
+            filterMap="[technicianPartyId:ec.user.userAccount?.partyId]"/>
+    <moqui.security.EntityFilter entityFilterId="ES_TECH_OWN_VISIT" entityFilterSetId="ES_TECHNICIAN_OWN"
+            entityName="ElectricalService.ElectricalServiceVisitDetail"
+            filterMap="[technicianPartyId:ec.user.userAccount?.partyId]"/>
+    <moqui.security.ArtifactAuthzFilter artifactAuthzId="ES_APP_TECHNICIAN" entityFilterSetId="ES_TECHNICIAN_OWN"/>
+
+    <!-- Technician mutating actions: start/complete a visit they are assigned to. start#Visit
+         and complete#Visit default to authz-action UPDATE (verb doesn't match create/update/
+         delete/find/get), which ES_APP_TECHNICIAN's VIEW-only grant does not cover, so they
+         need their own grant here (both the transition and the service are separately
+         authorized artifacts). The "assigned to them" check itself is enforced inside the
+         services, not by this grant - this grant only says a Technician may reach these
+         actions at all; either Technician can start/complete either Technician's visit as far
+         as this grant is concerned. -->
+    <moqui.security.ArtifactGroup artifactGroupId="ES_TECHNICIAN_ACTIONS" description="Electrical Service Technician actions"/>
+    <moqui.security.ArtifactGroupMember artifactGroupId="ES_TECHNICIAN_ACTIONS" artifactTypeEnumId="AT_XML_SCREEN_TRANS"
+            artifactName="component://ElectricalService/screen/ElectricalServiceRoot/ServiceVisits/ViewServiceVisit.xml/startVisit" inheritAuthz="Y"/>
+    <moqui.security.ArtifactGroupMember artifactGroupId="ES_TECHNICIAN_ACTIONS" artifactTypeEnumId="AT_XML_SCREEN_TRANS"
+            artifactName="component://ElectricalService/screen/ElectricalServiceRoot/ServiceVisits/ViewServiceVisit.xml/completeVisit" inheritAuthz="Y"/>
+    <moqui.security.ArtifactGroupMember artifactGroupId="ES_TECHNICIAN_ACTIONS" artifactTypeEnumId="AT_SERVICE"
+            artifactName="ElectricalService.ElectricalServiceServices.start#Visit" nameIsPattern="N" inheritAuthz="Y"/>
+    <moqui.security.ArtifactGroupMember artifactGroupId="ES_TECHNICIAN_ACTIONS" artifactTypeEnumId="AT_SERVICE"
+            artifactName="ElectricalService.ElectricalServiceServices.complete#Visit" nameIsPattern="N" inheritAuthz="Y"/>
+    <moqui.security.ArtifactGroupMember artifactGroupId="ES_TECHNICIAN_ACTIONS" artifactTypeEnumId="AT_REST_PATH"
+            artifactName="/electricalService/serviceRequests/.*/complete" nameIsPattern="Y" inheritAuthz="Y"/>
+    <moqui.security.ArtifactAuthz artifactAuthzId="ES_ACTIONS_TECHNICIAN" userGroupId="ES_TECHNICIAN" artifactGroupId="ES_TECHNICIAN_ACTIONS"
+            authzTypeEnumId="AUTHZT_ALWAYS" authzActionEnumId="AUTHZA_ALL"/>
+
+</entity-facade-xml>

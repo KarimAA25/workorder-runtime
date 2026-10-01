@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Auto-discovered by RestApi (any *.rest.xml under a component's service/ dir).
+     GET=find/get, POST=create/do (per the same convention as mantle.rest.xml).
+     require-authentication left at its default (true); authorization is entirely
+     through the services these paths call (see data/ElectricalServiceSeedData.xml). -->
+<resource xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://moqui.org/xsd/rest-api-3.xsd"
+        name="electricalService" displayName="Electrical Service REST API" version="1.0.0">
+    <resource name="serviceRequests" description="Electrical service requests">
+        <method type="get"><service name="ElectricalService.ElectricalServiceServices.find#ServiceRequests"/></method>
+        <method type="post"><service name="ElectricalService.ElectricalServiceServices.create#ServiceRequest"/></method>
+        <id name="serviceRequestId">
+            <method type="get"><service name="ElectricalService.ElectricalServiceServices.get#ServiceRequest"/></method>
+            <method type="patch"><service name="ElectricalService.ElectricalServiceServices.update#ServiceRequest"/></method>
+            <resource name="assignTechnician" description="Assign a technician to the request">
+                <method type="post"><service name="ElectricalService.ElectricalServiceServices.assign#Technician"/></method>
+            </resource>
+            <resource name="complete" description="Complete the request's current in-progress visit">
+                <method type="post"><service name="ElectricalService.ElectricalServiceServices.complete#ServiceRequest"/></method>
+            </resource>
+        </id>
+    </resource>
+</resource>

@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<screen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://moqui.org/xsd/xml-screen-3.xsd"
+        default-menu-title="Service Visit" default-menu-index="1">
+
+    <parameter name="serviceVisitId" required="true"/>
+
+    <transition name="startVisit" authz-action="update">
+        <service-call name="ElectricalService.ElectricalServiceServices.start#Visit"/>
+        <default-response url="."/></transition>
+    <transition name="completeVisit" authz-action="update">
+        <service-call name="ElectricalService.ElectricalServiceServices.complete#Visit"/>
+        <default-response url="."/></transition>
+
+    <actions>
+        <entity-find-one entity-name="ElectricalService.ElectricalServiceVisitDetail" value-field="serviceVisit">
+            <field-map field-name="serviceVisitId"/></entity-find-one>
+        <if condition="serviceVisit == null"><return error="true" message="Service Visit ${serviceVisitId} not found"/></if>
+        <set field="statusId" from="serviceVisit.statusId"/>
+        <set field="changedEntityName" value="mantle.work.effort.WorkEffort"/>
+        <set field="pkPrimaryValue" from="serviceVisitId"/>
+    </actions>
+    <widgets>
+        <container-row><row-col md="7">
+            <label text="Service Visit #${serviceVisitId}" type="h4"/>
+
+            <form-single name="ViewServiceVisit" map="serviceVisit" skip-form="true">
+                <field name="serviceRequestId"><default-field title="Request">
+                    <link url="../../ServiceRequests/EditServiceRequest" text="${serviceRequestId}" link-type="anchor"/></default-field></field>
+                <field name="technicianPartyId"><default-field title="Technician">
+                    <display-entity entity-name="mantle.party.PartyDetail" text="PartyNameTemplate"/></default-field></field>
+                <field name="scheduledDate"><default-field title="Scheduled"><display/></default-field></field>
+                <field name="startTime"><default-field title="Started"><display/></default-field></field>
+                <field name="endTime"><default-field title="Ended"><display/></default-field></field>
+                <field name="workNotes"><default-field title="Work Notes"><display type="text-area"/></default-field></field>
+
+                <field-layout>
+                    <field-row><field-ref name="serviceRequestId"/><field-ref name="technicianPartyId"/></field-row>
+                    <field-row><field-ref name="scheduledDate"/><field-ref name="startTime"/><field-ref name="endTime"/></field-row>
+                    <field-row><field-ref name="workNotes"/></field-row>
+                </field-layout>
+            </form-single>
+        </row-col><row-col md="5">
+            <section-include name="StatusHistorySection" location="component://SimpleScreens/template/basic/StatusWidgets.xml"/>
+
+            <container-box><box-header title="Workflow Actions"/><box-body>
+                <link url="startVisit" text="Start Visit" btn-type="primary" condition="statusId == 'EsvScheduled'"
+                        parameter-map="[serviceVisitId:serviceVisitId]" confirmation="Start Service Visit ${serviceVisitId}?"/>
+
+                <container-dialog id="CompleteVisitDialog" button-text="Complete Visit" condition="statusId == 'EsvInProgress'">
+                    <form-single name="CompleteVisitForm" transition="completeVisit">
+                        <field name="serviceVisitId"><default-field><hidden/></default-field></field>
+                        <field name="workNotes"><default-field title="Work Notes"><text-area rows="8"/></default-field></field>
+                        <field name="submitButton"><default-field title="Complete"><submit/></default-field></field>
+                    </form-single>
+                </container-dialog>
+            </box-body></container-box>
+        </row-col></container-row>
+    </widgets>
+</screen>

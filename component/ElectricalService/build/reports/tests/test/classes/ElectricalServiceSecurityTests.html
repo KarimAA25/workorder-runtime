@@ -1,0 +1,554 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+<meta http-equiv="x-ua-compatible" content="IE=edge"/>
+<title>Test results - Class ElectricalServiceSecurityTests</title>
+<link href="../css/base-style.css" rel="stylesheet" type="text/css"/>
+<link href="../css/style.css" rel="stylesheet" type="text/css"/>
+<script src="../js/report.js" type="text/javascript"></script>
+</head>
+<body>
+<div id="content">
+<h1>Class ElectricalServiceSecurityTests</h1>
+<div class="breadcrumbs">
+<a href="../index.html">all</a> &gt; 
+<a href="../packages/default-package.html">default-package</a> &gt; ElectricalServiceSecurityTests</div>
+<div id="summary">
+<table>
+<tr>
+<td>
+<div class="summaryGroup">
+<table>
+<tr>
+<td>
+<div class="infoBox" id="tests">
+<div class="counter">8</div>
+<p>tests</p>
+</div>
+</td>
+<td>
+<div class="infoBox" id="failures">
+<div class="counter">0</div>
+<p>failures</p>
+</div>
+</td>
+<td>
+<div class="infoBox" id="ignored">
+<div class="counter">0</div>
+<p>ignored</p>
+</div>
+</td>
+<td>
+<div class="infoBox" id="duration">
+<div class="counter">0.265s</div>
+<p>duration</p>
+</div>
+</td>
+</tr>
+</table>
+</div>
+</td>
+<td>
+<div class="infoBox success" id="successRate">
+<div class="percent">100%</div>
+<p>successful</p>
+</div>
+</td>
+</tr>
+</table>
+</div>
+<div class="tab-container">
+<ul class="tabLinks">
+<li>
+<a href="#">Tests</a>
+</li>
+<li>
+<a href="#">Standard output</a>
+</li>
+</ul>
+<div class="tab">
+<h2>Tests</h2>
+<table>
+<thead>
+<tr>
+<th>Test</th>
+<th>Duration</th>
+<th>Result</th>
+</tr>
+</thead>
+<tr>
+<td class="success">Dispatcher sees the Service Request regardless of technician assignment</td>
+<td class="success">0.023s</td>
+<td class="success">passed</td>
+</tr>
+<tr>
+<td class="success">Technician 1 (assigned) sees the Service Request via find</td>
+<td class="success">0.094s</td>
+<td class="success">passed</td>
+</tr>
+<tr>
+<td class="success">Technician 2 (not assigned) does not see the Service Request via find</td>
+<td class="success">0.026s</td>
+<td class="success">passed</td>
+</tr>
+<tr>
+<td class="success">Technician 2 (not assigned) does not see the Service Request via get</td>
+<td class="success">0.065s</td>
+<td class="success">passed</td>
+</tr>
+<tr>
+<td class="success">Technician 2 cannot complete Technician 1's Visit</td>
+<td class="success">0.017s</td>
+<td class="success">passed</td>
+</tr>
+<tr>
+<td class="success">Technician 2 cannot start Technician 1's Visit</td>
+<td class="success">0.020s</td>
+<td class="success">passed</td>
+</tr>
+<tr>
+<td class="success">Technician cannot schedule a Visit (Dispatcher-only action)</td>
+<td class="success">0.017s</td>
+<td class="success">passed</td>
+</tr>
+<tr>
+<td class="success">unauthenticated caller cannot create a Service Request</td>
+<td class="success">0.003s</td>
+<td class="success">passed</td>
+</tr>
+</table>
+</div>
+<div class="tab">
+<h2>Standard output</h2>
+<span class="code">
+<pre id="class-stdout">?[32m21:45:42.159  INFO quiWorker-14          o.moqui.i.c.MessageFacadeImpl?[m [danger] No Elastic Client found for cluster name default, not indexing documents
+?[32m21:45:42.174  INFO quiWorker-15          o.moqui.i.c.MessageFacadeImpl?[m [danger] No Elastic Client found for cluster name default, not indexing documents
+?[32m21:45:42.176  INFO  Test worker             o.moqui.i.c.UserFacadeImpl?[m Setting hasLoggedOut for user ES_DISPATCH1
+?[32m21:45:42.199  INFO oquiWorker-3          o.moqui.i.c.MessageFacadeImpl?[m [danger] No Elastic Client found for cluster name default, not indexing documents
+?[32m21:45:42.269  INFO  Test worker             o.moqui.i.c.UserFacadeImpl?[m Setting hasLoggedOut for user ES_TECH1
+?[32m21:45:42.295  INFO  Test worker             o.moqui.i.c.UserFacadeImpl?[m Setting hasLoggedOut for user ES_TECH2
+?[1;31m21:45:42.359 ERROR  Test worker          o.moqui.i.c.MessageFacadeImpl?[m Service Request 100024 not found
+?[33m21:45:42.359  WARN  Test worker      o.moqui.i.c.TransactionFacadeImpl?[m Transaction rollback for [Error running service ElectricalService.ElectricalServiceServices.get#ServiceRequest (message): Service Request 100024 not found
+]. Here is the current location: 
+org.moqui.BaseException: Rollback location
+	at org.moqui.impl.context.TransactionFacadeImpl.rollback(TransactionFacadeImpl.groovy:475)
+	at org.moqui.impl.context.TransactionFacadeImpl.rollback(TransactionFacadeImpl.groovy:447)
+	at org.moqui.impl.service.ServiceCallSyncImpl.callSingle(ServiceCallSyncImpl.java:334)
+	at org.moqui.impl.service.ServiceCallSyncImpl.call(ServiceCallSyncImpl.java:125)
+	at ElectricalServiceSecurityTests.$spock_feature_0_2(ElectricalServiceSecurityTests.groovy:79)
+	at java.base/jdk.internal.reflect.DirectMethodHandleAccessor.invoke(DirectMethodHandleAccessor.java:103)
+	at org.spockframework.util.ReflectionUtil.invokeMethod(ReflectionUtil.java:277)
+	at org.spockframework.runtime.model.MethodInfo.lambda$new$0(MethodInfo.java:49)
+	at org.spockframework.runtime.model.MethodInfo.invoke(MethodInfo.java:157)
+	at org.spockframework.runtime.extension.MethodInvocation.proceed(MethodInvocation.java:141)
+	at org.spockframework.junit4.ExceptionAdapterInterceptor.intercept(ExceptionAdapterInterceptor.java:13)
+	at org.spockframework.runtime.extension.MethodInvocation.proceed(MethodInvocation.java:139)
+	at org.spockframework.runtime.PlatformSpecRunner.invoke(PlatformSpecRunner.java:433)
+	at org.spockframework.runtime.PlatformSpecRunner.runFeatureMethod(PlatformSpecRunner.java:336)
+	at org.spockframework.runtime.IterationNode.execute(IterationNode.java:51)
+	at org.spockframework.runtime.IterationNode.execute(IterationNode.java:13)
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.lambda$executeRecursively$2(NodeTestTask.java:176)
+	at org.junit.platform.engine.support.hierarchical.ThrowableCollector.execute(ThrowableCollector.java:74)
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.lambda$executeRecursively$1(NodeTestTask.java:166)
+	at org.spockframework.runtime.SpockNode.sneakyInvoke(SpockNode.java:40)
+	at org.spockframework.runtime.IterationNode.lambda$around$0(IterationNode.java:68)
+	at org.spockframework.runtime.PlatformSpecRunner.lambda$createMethodInfoForDoRunIteration$5(PlatformSpecRunner.java:244)
+	at org.spockframework.runtime.model.MethodInfo.invoke(MethodInfo.java:157)
+	at org.spockframework.runtime.extension.MethodInvocation.proceed(MethodInvocation.java:141)
+	at org.spockframework.junit4.ExceptionAdapterInterceptor.intercept(ExceptionAdapterInterceptor.java:13)
+	at org.spockframework.runtime.extension.MethodInvocation.proceed(MethodInvocation.java:139)
+	at org.spockframework.runtime.PlatformSpecRunner.invoke(PlatformSpecRunner.java:433)
+	at org.spockframework.runtime.PlatformSpecRunner.runIteration(PlatformSpecRunner.java:226)
+	at org.spockframework.runtime.IterationNode.around(IterationNode.java:68)
+	at org.spockframework.runtime.IterationNode.around(IterationNode.java:13)
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.lambda$executeRecursively$0(NodeTestTask.java:164)
+	at org.junit.platform.engine.support.hierarchical.ThrowableCollector.execute(ThrowableCollector.java:74)
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.executeRecursively(NodeTestTask.java:163)
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.execute(NodeTestTask.java:116)
+	at org.junit.platform.engine.support.hierarchical.SameThreadHierarchicalTestExecutorService.submit(SameThreadHierarchicalTestExecutorService.java:36)
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask$DefaultDynamicTestExecutor.execute(NodeTestTask.java:268)
+	at org.spockframework.runtime.SimpleFeatureNode.execute(SimpleFeatureNode.java:58)
+	at org.spockframework.runtime.SimpleFeatureNode.execute(SimpleFeatureNode.java:19)
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.lambda$executeRecursively$2(NodeTestTask.java:176)
+	at org.junit.platform.engine.support.hierarchical.ThrowableCollector.execute(ThrowableCollector.java:74)
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.lambda$executeRecursively$1(NodeTestTask.java:166)
+	at org.spockframework.runtime.SpockNode.sneakyInvoke(SpockNode.java:40)
+	at org.spockframework.runtime.FeatureNode.lambda$around$0(FeatureNode.java:73)
+	at org.spockframework.runtime.PlatformSpecRunner.lambda$createMethodInfoForDoRunFeature$4(PlatformSpecRunner.java:208)
+	at org.spockframework.runtime.model.MethodInfo.invoke(MethodInfo.java:157)
+	at org.spockframework.runtime.PlatformSpecRunner.invokeRaw(PlatformSpecRunner.java:442)
+	at org.spockframework.runtime.PlatformSpecRunner.invoke(PlatformSpecRunner.java:425)
+	at org.spockframework.runtime.PlatformSpecRunner.runFeature(PlatformSpecRunner.java:199)
+	at org.spockframework.runtime.FeatureNode.around(FeatureNode.java:73)
+	at org.spockframework.runtime.FeatureNode.around(FeatureNode.java:30)
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.lambda$executeRecursively$0(NodeTestTask.java:164)
+	at org.junit.platform.engine.support.hierarchical.ThrowableCollector.execute(ThrowableCollector.java:74)
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.executeRecursively(NodeTestTask.java:163)
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.execute(NodeTestTask.java:116)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1596)
+	at org.junit.platform.engine.support.hierarchical.SameThreadHierarchicalTestExecutorService.invokeAll(SameThreadHierarchicalTestExecutorService.java:42)
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.lambda$executeRecursively$2(NodeTestTask.java:180)
+	at org.junit.platform.engine.support.hierarchical.ThrowableCollector.execute(ThrowableCollector.java:74)
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.lambda$executeRecursively$1(NodeTestTask.java:166)
+	at org.spockframework.runtime.SpockNode.sneakyInvoke(SpockNode.java:40)
+	at org.spockframework.runtime.SpecNode.lambda$around$0(SpecNode.java:72)
+	at org.spockframework.runtime.PlatformSpecRunner.lambda$createMethodInfoForDoRunSpec$0(PlatformSpecRunner.java:66)
+	at org.spockframework.runtime.model.MethodInfo.invoke(MethodInfo.java:157)
+	at org.spockframework.runtime.PlatformSpecRunner.invokeRaw(PlatformSpecRunner.java:442)
+	at org.spockframework.runtime.PlatformSpecRunner.invoke(PlatformSpecRunner.java:425)
+	at org.spockframework.runtime.PlatformSpecRunner.runSpec(PlatformSpecRunner.java:59)
+	at org.spockframework.runtime.SpecNode.around(SpecNode.java:72)
+	at org.spockframework.runtime.SpecNode.around(SpecNode.java:12)
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.lambda$executeRecursively$0(NodeTestTask.java:164)
+	at org.junit.platform.engine.support.hierarchical.ThrowableCollector.execute(ThrowableCollector.java:74)
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.executeRecursively(NodeTestTask.java:163)
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.execute(NodeTestTask.java:116)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1596)
+	at org.junit.platform.engine.support.hierarchical.SameThreadHierarchicalTestExecutorService.invokeAll(SameThreadHierarchicalTestExecutorService.java:42)
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.lambda$executeRecursively$2(NodeTestTask.java:180)
+	at org.junit.platform.engine.support.hierarchical.ThrowableCollector.execute(ThrowableCollector.java:74)
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.lambda$executeRecursively$1(NodeTestTask.java:166)
+	at org.junit.platform.engine.support.hierarchical.Node.around(Node.java:139)
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.lambda$executeRecursively$0(NodeTestTask.java:164)
+	at org.junit.platform.engine.support.hierarchical.ThrowableCollector.execute(ThrowableCollector.java:74)
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.executeRecursively(NodeTestTask.java:163)
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.execute(NodeTestTask.java:116)
+	at org.junit.platform.engine.support.hierarchical.SameThreadHierarchicalTestExecutorService.submit(SameThreadHierarchicalTestExecutorService.java:36)
+	at org.junit.platform.engine.support.hierarchical.HierarchicalTestExecutor.execute(HierarchicalTestExecutor.java:52)
+	at org.junit.platform.engine.support.hierarchical.HierarchicalTestEngine.execute(HierarchicalTestEngine.java:58)
+	at org.junit.platform.launcher.core.EngineExecutionOrchestrator.executeEngine(EngineExecutionOrchestrator.java:256)
+	at org.junit.platform.launcher.core.EngineExecutionOrchestrator.failOrExecuteEngine(EngineExecutionOrchestrator.java:228)
+	at org.junit.platform.launcher.core.EngineExecutionOrchestrator.execute(EngineExecutionOrchestrator.java:189)
+	at org.junit.platform.launcher.core.EngineExecutionOrchestrator.execute(EngineExecutionOrchestrator.java:109)
+	at org.junit.platform.launcher.core.EngineExecutionOrchestrator.execute(EngineExecutionOrchestrator.java:90)
+	at org.junit.platform.suite.engine.SuiteLauncher.execute(SuiteLauncher.java:65)
+	at org.junit.platform.suite.engine.SuiteTestDescriptor.executeTests(SuiteTestDescriptor.java:212)
+	at org.junit.platform.suite.engine.SuiteTestDescriptor.execute(SuiteTestDescriptor.java:178)
+	at org.junit.platform.suite.engine.SuiteTestEngine.execute(SuiteTestEngine.java:80)
+	at org.junit.platform.launcher.core.EngineExecutionOrchestrator.executeEngine(EngineExecutionOrchestrator.java:256)
+	at org.junit.platform.launcher.core.EngineExecutionOrchestrator.failOrExecuteEngine(EngineExecutionOrchestrator.java:228)
+	at org.junit.platform.launcher.core.EngineExecutionOrchestrator.execute(EngineExecutionOrchestrator.java:189)
+	at org.junit.platform.launcher.core.EngineExecutionOrchestrator.execute(EngineExecutionOrchestrator.java:109)
+	at org.junit.platform.launcher.core.EngineExecutionOrchestrator.lambda$execute$0(EngineExecutionOrchestrator.java:66)
+	at org.junit.platform.launcher.core.EngineExecutionOrchestrator.withInterceptedStreams(EngineExecutionOrchestrator.java:168)
+	at org.junit.platform.launcher.core.EngineExecutionOrchestrator.execute(EngineExecutionOrchestrator.java:65)
+	at org.junit.platform.launcher.core.DefaultLauncher.execute(DefaultLauncher.java:137)
+	at org.junit.platform.launcher.core.DefaultLauncher.execute(DefaultLauncher.java:126)
+	at org.junit.platform.launcher.core.DefaultLauncher.execute(DefaultLauncher.java:100)
+	at org.junit.platform.launcher.core.DelegatingLauncher.execute(DelegatingLauncher.java:57)
+	at org.junit.platform.launcher.core.InterceptingLauncher.lambda$execute$0(InterceptingLauncher.java:46)
+	at org.junit.platform.launcher.core.ClasspathAlignmentCheckingLauncherInterceptor.intercept(ClasspathAlignmentCheckingLauncherInterceptor.java:25)
+	at org.junit.platform.launcher.core.InterceptingLauncher.execute(InterceptingLauncher.java:45)
+	at org.junit.platform.launcher.core.DelegatingLauncher.execute(DelegatingLauncher.java:57)
+	at org.gradle.api.internal.tasks.testing.junitplatform.JUnitPlatformTestClassProcessor$CollectAllTestClassesExecutor.processAllTestClasses(JUnitPlatformTestClassProcessor.java:135)
+	at org.gradle.api.internal.tasks.testing.junitplatform.JUnitPlatformTestClassProcessor$CollectAllTestClassesExecutor.access$000(JUnitPlatformTestClassProcessor.java:110)
+	at org.gradle.api.internal.tasks.testing.junitplatform.JUnitPlatformTestClassProcessor.stop(JUnitPlatformTestClassProcessor.java:104)
+	at org.gradle.api.internal.tasks.testing.SuiteTestClassProcessor.stop(SuiteTestClassProcessor.java:64)
+	at java.base/jdk.internal.reflect.DirectMethodHandleAccessor.invoke(DirectMethodHandleAccessor.java:103)
+	at org.gradle.internal.dispatch.MethodInvocation.invokeOn(MethodInvocation.java:77)
+	at org.gradle.internal.dispatch.ReflectionDispatch.dispatch(ReflectionDispatch.java:28)
+	at org.gradle.internal.dispatch.ReflectionDispatch.dispatch(ReflectionDispatch.java:19)
+	at org.gradle.internal.dispatch.ContextClassLoaderDispatch.dispatch(ContextClassLoaderDispatch.java:33)
+	at org.gradle.internal.dispatch.ProxyDispatchAdapter$DispatchingInvocationHandler.invoke(ProxyDispatchAdapter.java:88)
+	at jdk.proxy1/jdk.proxy1.$Proxy4.stop(Unknown Source)
+	at org.gradle.api.internal.tasks.testing.worker.TestWorker$3.run(TestWorker.java:194)
+	at org.gradle.api.internal.tasks.testing.worker.TestWorker.executeAndMaintainThreadName(TestWorker.java:126)
+	at org.gradle.api.internal.tasks.testing.worker.TestWorker.execute(TestWorker.java:103)
+	at org.gradle.api.internal.tasks.testing.worker.TestWorker.execute(TestWorker.java:63)
+	at org.gradle.process.internal.worker.child.ActionExecutionWorker.execute(ActionExecutionWorker.java:56)
+	at org.gradle.process.internal.worker.child.SystemApplicationClassLoaderWorker.call(SystemApplicationClassLoaderWorker.java:122)
+	at org.gradle.process.internal.worker.child.SystemApplicationClassLoaderWorker.call(SystemApplicationClassLoaderWorker.java:72)
+	at worker.org.gradle.process.internal.worker.GradleWorkerMain.run(GradleWorkerMain.java:69)
+	at worker.org.gradle.process.internal.worker.GradleWorkerMain.main(GradleWorkerMain.java:74)
+?[32m21:45:42.359  INFO  Test worker             o.moqui.i.c.UserFacadeImpl?[m Setting hasLoggedOut for user ES_TECH2
+?[32m21:45:42.386  INFO  Test worker             o.moqui.i.c.UserFacadeImpl?[m Setting hasLoggedOut for user ES_DISPATCH1
+?[1;31m21:45:42.399 ERROR  Test worker          o.moqui.i.c.MessageFacadeImpl?[m You are not the technician assigned to Service Visit 100023
+?[33m21:45:42.399  WARN  Test worker      o.moqui.i.c.TransactionFacadeImpl?[m Transaction rollback for [Error running service ElectricalService.ElectricalServiceServices.start#Visit (message): You are not the technician assigned to Service Visit 100023
+]. Here is the current location: 
+org.moqui.BaseException: Rollback location
+	at org.moqui.impl.context.TransactionFacadeImpl.rollback(TransactionFacadeImpl.groovy:475)
+	at org.moqui.impl.context.TransactionFacadeImpl.rollback(TransactionFacadeImpl.groovy:447)
+	at org.moqui.impl.service.ServiceCallSyncImpl.callSingle(ServiceCallSyncImpl.java:334)
+	at org.moqui.impl.service.ServiceCallSyncImpl.call(ServiceCallSyncImpl.java:125)
+	at ElectricalServiceSecurityTests.$spock_feature_0_4(ElectricalServiceSecurityTests.groovy:103)
+	at java.base/jdk.internal.reflect.DirectMethodHandleAccessor.invoke(DirectMethodHandleAccessor.java:103)
+	at org.spockframework.util.ReflectionUtil.invokeMethod(ReflectionUtil.java:277)
+	at org.spockframework.runtime.model.MethodInfo.lambda$new$0(MethodInfo.java:49)
+	at org.spockframework.runtime.model.MethodInfo.invoke(MethodInfo.java:157)
+	at org.spockframework.runtime.extension.MethodInvocation.proceed(MethodInvocation.java:141)
+	at org.spockframework.junit4.ExceptionAdapterInterceptor.intercept(ExceptionAdapterInterceptor.java:13)
+	at org.spockframework.runtime.extension.MethodInvocation.proceed(MethodInvocation.java:139)
+	at org.spockframework.runtime.PlatformSpecRunner.invoke(PlatformSpecRunner.java:433)
+	at org.spockframework.runtime.PlatformSpecRunner.runFeatureMethod(PlatformSpecRunner.java:336)
+	at org.spockframework.runtime.IterationNode.execute(IterationNode.java:51)
+	at org.spockframework.runtime.IterationNode.execute(IterationNode.java:13)
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.lambda$executeRecursively$2(NodeTestTask.java:176)
+	at org.junit.platform.engine.support.hierarchical.ThrowableCollector.execute(ThrowableCollector.java:74)
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.lambda$executeRecursively$1(NodeTestTask.java:166)
+	at org.spockframework.runtime.SpockNode.sneakyInvoke(SpockNode.java:40)
+	at org.spockframework.runtime.IterationNode.lambda$around$0(IterationNode.java:68)
+	at org.spockframework.runtime.PlatformSpecRunner.lambda$createMethodInfoForDoRunIteration$5(PlatformSpecRunner.java:244)
+	at org.spockframework.runtime.model.MethodInfo.invoke(MethodInfo.java:157)
+	at org.spockframework.runtime.extension.MethodInvocation.proceed(MethodInvocation.java:141)
+	at org.spockframework.junit4.ExceptionAdapterInterceptor.intercept(ExceptionAdapterInterceptor.java:13)
+	at org.spockframework.runtime.extension.MethodInvocation.proceed(MethodInvocation.java:139)
+	at org.spockframework.runtime.PlatformSpecRunner.invoke(PlatformSpecRunner.java:433)
+	at org.spockframework.runtime.PlatformSpecRunner.runIteration(PlatformSpecRunner.java:226)
+	at org.spockframework.runtime.IterationNode.around(IterationNode.java:68)
+	at org.spockframework.runtime.IterationNode.around(IterationNode.java:13)
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.lambda$executeRecursively$0(NodeTestTask.java:164)
+	at org.junit.platform.engine.support.hierarchical.ThrowableCollector.execute(ThrowableCollector.java:74)
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.executeRecursively(NodeTestTask.java:163)
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.execute(NodeTestTask.java:116)
+	at org.junit.platform.engine.support.hierarchical.SameThreadHierarchicalTestExecutorService.submit(SameThreadHierarchicalTestExecutorService.java:36)
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask$DefaultDynamicTestExecutor.execute(NodeTestTask.java:268)
+	at org.spockframework.runtime.SimpleFeatureNode.execute(SimpleFeatureNode.java:58)
+	at org.spockframework.runtime.SimpleFeatureNode.execute(SimpleFeatureNode.java:19)
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.lambda$executeRecursively$2(NodeTestTask.java:176)
+	at org.junit.platform.engine.support.hierarchical.ThrowableCollector.execute(ThrowableCollector.java:74)
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.lambda$executeRecursively$1(NodeTestTask.java:166)
+	at org.spockframework.runtime.SpockNode.sneakyInvoke(SpockNode.java:40)
+	at org.spockframework.runtime.FeatureNode.lambda$around$0(FeatureNode.java:73)
+	at org.spockframework.runtime.PlatformSpecRunner.lambda$createMethodInfoForDoRunFeature$4(PlatformSpecRunner.java:208)
+	at org.spockframework.runtime.model.MethodInfo.invoke(MethodInfo.java:157)
+	at org.spockframework.runtime.PlatformSpecRunner.invokeRaw(PlatformSpecRunner.java:442)
+	at org.spockframework.runtime.PlatformSpecRunner.invoke(PlatformSpecRunner.java:425)
+	at org.spockframework.runtime.PlatformSpecRunner.runFeature(PlatformSpecRunner.java:199)
+	at org.spockframework.runtime.FeatureNode.around(FeatureNode.java:73)
+	at org.spockframework.runtime.FeatureNode.around(FeatureNode.java:30)
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.lambda$executeRecursively$0(NodeTestTask.java:164)
+	at org.junit.platform.engine.support.hierarchical.ThrowableCollector.execute(ThrowableCollector.java:74)
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.executeRecursively(NodeTestTask.java:163)
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.execute(NodeTestTask.java:116)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1596)
+	at org.junit.platform.engine.support.hierarchical.SameThreadHierarchicalTestExecutorService.invokeAll(SameThreadHierarchicalTestExecutorService.java:42)
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.lambda$executeRecursively$2(NodeTestTask.java:180)
+	at org.junit.platform.engine.support.hierarchical.ThrowableCollector.execute(ThrowableCollector.java:74)
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.lambda$executeRecursively$1(NodeTestTask.java:166)
+	at org.spockframework.runtime.SpockNode.sneakyInvoke(SpockNode.java:40)
+	at org.spockframework.runtime.SpecNode.lambda$around$0(SpecNode.java:72)
+	at org.spockframework.runtime.PlatformSpecRunner.lambda$createMethodInfoForDoRunSpec$0(PlatformSpecRunner.java:66)
+	at org.spockframework.runtime.model.MethodInfo.invoke(MethodInfo.java:157)
+	at org.spockframework.runtime.PlatformSpecRunner.invokeRaw(PlatformSpecRunner.java:442)
+	at org.spockframework.runtime.PlatformSpecRunner.invoke(PlatformSpecRunner.java:425)
+	at org.spockframework.runtime.PlatformSpecRunner.runSpec(PlatformSpecRunner.java:59)
+	at org.spockframework.runtime.SpecNode.around(SpecNode.java:72)
+	at org.spockframework.runtime.SpecNode.around(SpecNode.java:12)
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.lambda$executeRecursively$0(NodeTestTask.java:164)
+	at org.junit.platform.engine.support.hierarchical.ThrowableCollector.execute(ThrowableCollector.java:74)
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.executeRecursively(NodeTestTask.java:163)
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.execute(NodeTestTask.java:116)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1596)
+	at org.junit.platform.engine.support.hierarchical.SameThreadHierarchicalTestExecutorService.invokeAll(SameThreadHierarchicalTestExecutorService.java:42)
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.lambda$executeRecursively$2(NodeTestTask.java:180)
+	at org.junit.platform.engine.support.hierarchical.ThrowableCollector.execute(ThrowableCollector.java:74)
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.lambda$executeRecursively$1(NodeTestTask.java:166)
+	at org.junit.platform.engine.support.hierarchical.Node.around(Node.java:139)
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.lambda$executeRecursively$0(NodeTestTask.java:164)
+	at org.junit.platform.engine.support.hierarchical.ThrowableCollector.execute(ThrowableCollector.java:74)
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.executeRecursively(NodeTestTask.java:163)
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.execute(NodeTestTask.java:116)
+	at org.junit.platform.engine.support.hierarchical.SameThreadHierarchicalTestExecutorService.submit(SameThreadHierarchicalTestExecutorService.java:36)
+	at org.junit.platform.engine.support.hierarchical.HierarchicalTestExecutor.execute(HierarchicalTestExecutor.java:52)
+	at org.junit.platform.engine.support.hierarchical.HierarchicalTestEngine.execute(HierarchicalTestEngine.java:58)
+	at org.junit.platform.launcher.core.EngineExecutionOrchestrator.executeEngine(EngineExecutionOrchestrator.java:256)
+	at org.junit.platform.launcher.core.EngineExecutionOrchestrator.failOrExecuteEngine(EngineExecutionOrchestrator.java:228)
+	at org.junit.platform.launcher.core.EngineExecutionOrchestrator.execute(EngineExecutionOrchestrator.java:189)
+	at org.junit.platform.launcher.core.EngineExecutionOrchestrator.execute(EngineExecutionOrchestrator.java:109)
+	at org.junit.platform.launcher.core.EngineExecutionOrchestrator.execute(EngineExecutionOrchestrator.java:90)
+	at org.junit.platform.suite.engine.SuiteLauncher.execute(SuiteLauncher.java:65)
+	at org.junit.platform.suite.engine.SuiteTestDescriptor.executeTests(SuiteTestDescriptor.java:212)
+	at org.junit.platform.suite.engine.SuiteTestDescriptor.execute(SuiteTestDescriptor.java:178)
+	at org.junit.platform.suite.engine.SuiteTestEngine.execute(SuiteTestEngine.java:80)
+	at org.junit.platform.launcher.core.EngineExecutionOrchestrator.executeEngine(EngineExecutionOrchestrator.java:256)
+	at org.junit.platform.launcher.core.EngineExecutionOrchestrator.failOrExecuteEngine(EngineExecutionOrchestrator.java:228)
+	at org.junit.platform.launcher.core.EngineExecutionOrchestrator.execute(EngineExecutionOrchestrator.java:189)
+	at org.junit.platform.launcher.core.EngineExecutionOrchestrator.execute(EngineExecutionOrchestrator.java:109)
+	at org.junit.platform.launcher.core.EngineExecutionOrchestrator.lambda$execute$0(EngineExecutionOrchestrator.java:66)
+	at org.junit.platform.launcher.core.EngineExecutionOrchestrator.withInterceptedStreams(EngineExecutionOrchestrator.java:168)
+	at org.junit.platform.launcher.core.EngineExecutionOrchestrator.execute(EngineExecutionOrchestrator.java:65)
+	at org.junit.platform.launcher.core.DefaultLauncher.execute(DefaultLauncher.java:137)
+	at org.junit.platform.launcher.core.DefaultLauncher.execute(DefaultLauncher.java:126)
+	at org.junit.platform.launcher.core.DefaultLauncher.execute(DefaultLauncher.java:100)
+	at org.junit.platform.launcher.core.DelegatingLauncher.execute(DelegatingLauncher.java:57)
+	at org.junit.platform.launcher.core.InterceptingLauncher.lambda$execute$0(InterceptingLauncher.java:46)
+	at org.junit.platform.launcher.core.ClasspathAlignmentCheckingLauncherInterceptor.intercept(ClasspathAlignmentCheckingLauncherInterceptor.java:25)
+	at org.junit.platform.launcher.core.InterceptingLauncher.execute(InterceptingLauncher.java:45)
+	at org.junit.platform.launcher.core.DelegatingLauncher.execute(DelegatingLauncher.java:57)
+	at org.gradle.api.internal.tasks.testing.junitplatform.JUnitPlatformTestClassProcessor$CollectAllTestClassesExecutor.processAllTestClasses(JUnitPlatformTestClassProcessor.java:135)
+	at org.gradle.api.internal.tasks.testing.junitplatform.JUnitPlatformTestClassProcessor$CollectAllTestClassesExecutor.access$000(JUnitPlatformTestClassProcessor.java:110)
+	at org.gradle.api.internal.tasks.testing.junitplatform.JUnitPlatformTestClassProcessor.stop(JUnitPlatformTestClassProcessor.java:104)
+	at org.gradle.api.internal.tasks.testing.SuiteTestClassProcessor.stop(SuiteTestClassProcessor.java:64)
+	at java.base/jdk.internal.reflect.DirectMethodHandleAccessor.invoke(DirectMethodHandleAccessor.java:103)
+	at org.gradle.internal.dispatch.MethodInvocation.invokeOn(MethodInvocation.java:77)
+	at org.gradle.internal.dispatch.ReflectionDispatch.dispatch(ReflectionDispatch.java:28)
+	at org.gradle.internal.dispatch.ReflectionDispatch.dispatch(ReflectionDispatch.java:19)
+	at org.gradle.internal.dispatch.ContextClassLoaderDispatch.dispatch(ContextClassLoaderDispatch.java:33)
+	at org.gradle.internal.dispatch.ProxyDispatchAdapter$DispatchingInvocationHandler.invoke(ProxyDispatchAdapter.java:88)
+	at jdk.proxy1/jdk.proxy1.$Proxy4.stop(Unknown Source)
+	at org.gradle.api.internal.tasks.testing.worker.TestWorker$3.run(TestWorker.java:194)
+	at org.gradle.api.internal.tasks.testing.worker.TestWorker.executeAndMaintainThreadName(TestWorker.java:126)
+	at org.gradle.api.internal.tasks.testing.worker.TestWorker.execute(TestWorker.java:103)
+	at org.gradle.api.internal.tasks.testing.worker.TestWorker.execute(TestWorker.java:63)
+	at org.gradle.process.internal.worker.child.ActionExecutionWorker.execute(ActionExecutionWorker.java:56)
+	at org.gradle.process.internal.worker.child.SystemApplicationClassLoaderWorker.call(SystemApplicationClassLoaderWorker.java:122)
+	at org.gradle.process.internal.worker.child.SystemApplicationClassLoaderWorker.call(SystemApplicationClassLoaderWorker.java:72)
+	at worker.org.gradle.process.internal.worker.GradleWorkerMain.run(GradleWorkerMain.java:69)
+	at worker.org.gradle.process.internal.worker.GradleWorkerMain.main(GradleWorkerMain.java:74)
+?[32m21:45:42.403  INFO  Test worker             o.moqui.i.c.UserFacadeImpl?[m Setting hasLoggedOut for user ES_TECH2
+?[1;31m21:45:42.422 ERROR  Test worker          o.moqui.i.c.MessageFacadeImpl?[m You are not the technician assigned to Service Visit 100023
+?[33m21:45:42.422  WARN  Test worker      o.moqui.i.c.TransactionFacadeImpl?[m Transaction rollback for [Error running service ElectricalService.ElectricalServiceServices.complete#Visit (message): You are not the technician assigned to Service Visit 100023
+]. Here is the current location: 
+org.moqui.BaseException: Rollback location
+	at org.moqui.impl.context.TransactionFacadeImpl.rollback(TransactionFacadeImpl.groovy:475)
+	at org.moqui.impl.context.TransactionFacadeImpl.rollback(TransactionFacadeImpl.groovy:447)
+	at org.moqui.impl.service.ServiceCallSyncImpl.callSingle(ServiceCallSyncImpl.java:334)
+	at org.moqui.impl.service.ServiceCallSyncImpl.call(ServiceCallSyncImpl.java:125)
+	at ElectricalServiceSecurityTests.$spock_feature_0_5(ElectricalServiceSecurityTests.groovy:117)
+	at java.base/jdk.internal.reflect.DirectMethodHandleAccessor.invoke(DirectMethodHandleAccessor.java:103)
+	at org.spockframework.util.ReflectionUtil.invokeMethod(ReflectionUtil.java:277)
+	at org.spockframework.runtime.model.MethodInfo.lambda$new$0(MethodInfo.java:49)
+	at org.spockframework.runtime.model.MethodInfo.invoke(MethodInfo.java:157)
+	at org.spockframework.runtime.extension.MethodInvocation.proceed(MethodInvocation.java:141)
+	at org.spockframework.junit4.ExceptionAdapterInterceptor.intercept(ExceptionAdapterInterceptor.java:13)
+	at org.spockframework.runtime.extension.MethodInvocation.proceed(MethodInvocation.java:139)
+	at org.spockframework.runtime.PlatformSpecRunner.invoke(PlatformSpecRunner.java:433)
+	at org.spockframework.runtime.PlatformSpecRunner.runFeatureMethod(PlatformSpecRunner.java:336)
+	at org.spockframework.runtime.IterationNode.execute(IterationNode.java:51)
+	at org.spockframework.runtime.IterationNode.execute(IterationNode.java:13)
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.lambda$executeRecursively$2(NodeTestTask.java:176)
+	at org.junit.platform.engine.support.hierarchical.ThrowableCollector.execute(ThrowableCollector.java:74)
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.lambda$executeRecursively$1(NodeTestTask.java:166)
+	at org.spockframework.runtime.SpockNode.sneakyInvoke(SpockNode.java:40)
+	at org.spockframework.runtime.IterationNode.lambda$around$0(IterationNode.java:68)
+	at org.spockframework.runtime.PlatformSpecRunner.lambda$createMethodInfoForDoRunIteration$5(PlatformSpecRunner.java:244)
+	at org.spockframework.runtime.model.MethodInfo.invoke(MethodInfo.java:157)
+	at org.spockframework.runtime.extension.MethodInvocation.proceed(MethodInvocation.java:141)
+	at org.spockframework.junit4.ExceptionAdapterInterceptor.intercept(ExceptionAdapterInterceptor.java:13)
+	at org.spockframework.runtime.extension.MethodInvocation.proceed(MethodInvocation.java:139)
+	at org.spockframework.runtime.PlatformSpecRunner.invoke(PlatformSpecRunner.java:433)
+	at org.spockframework.runtime.PlatformSpecRunner.runIteration(PlatformSpecRunner.java:226)
+	at org.spockframework.runtime.IterationNode.around(IterationNode.java:68)
+	at org.spockframework.runtime.IterationNode.around(IterationNode.java:13)
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.lambda$executeRecursively$0(NodeTestTask.java:164)
+	at org.junit.platform.engine.support.hierarchical.ThrowableCollector.execute(ThrowableCollector.java:74)
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.executeRecursively(NodeTestTask.java:163)
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.execute(NodeTestTask.java:116)
+	at org.junit.platform.engine.support.hierarchical.SameThreadHierarchicalTestExecutorService.submit(SameThreadHierarchicalTestExecutorService.java:36)
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask$DefaultDynamicTestExecutor.execute(NodeTestTask.java:268)
+	at org.spockframework.runtime.SimpleFeatureNode.execute(SimpleFeatureNode.java:58)
+	at org.spockframework.runtime.SimpleFeatureNode.execute(SimpleFeatureNode.java:19)
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.lambda$executeRecursively$2(NodeTestTask.java:176)
+	at org.junit.platform.engine.support.hierarchical.ThrowableCollector.execute(ThrowableCollector.java:74)
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.lambda$executeRecursively$1(NodeTestTask.java:166)
+	at org.spockframework.runtime.SpockNode.sneakyInvoke(SpockNode.java:40)
+	at org.spockframework.runtime.FeatureNode.lambda$around$0(FeatureNode.java:73)
+	at org.spockframework.runtime.PlatformSpecRunner.lambda$createMethodInfoForDoRunFeature$4(PlatformSpecRunner.java:208)
+	at org.spockframework.runtime.model.MethodInfo.invoke(MethodInfo.java:157)
+	at org.spockframework.runtime.PlatformSpecRunner.invokeRaw(PlatformSpecRunner.java:442)
+	at org.spockframework.runtime.PlatformSpecRunner.invoke(PlatformSpecRunner.java:425)
+	at org.spockframework.runtime.PlatformSpecRunner.runFeature(PlatformSpecRunner.java:199)
+	at org.spockframework.runtime.FeatureNode.around(FeatureNode.java:73)
+	at org.spockframework.runtime.FeatureNode.around(FeatureNode.java:30)
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.lambda$executeRecursively$0(NodeTestTask.java:164)
+	at org.junit.platform.engine.support.hierarchical.ThrowableCollector.execute(ThrowableCollector.java:74)
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.executeRecursively(NodeTestTask.java:163)
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.execute(NodeTestTask.java:116)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1596)
+	at org.junit.platform.engine.support.hierarchical.SameThreadHierarchicalTestExecutorService.invokeAll(SameThreadHierarchicalTestExecutorService.java:42)
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.lambda$executeRecursively$2(NodeTestTask.java:180)
+	at org.junit.platform.engine.support.hierarchical.ThrowableCollector.execute(ThrowableCollector.java:74)
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.lambda$executeRecursively$1(NodeTestTask.java:166)
+	at org.spockframework.runtime.SpockNode.sneakyInvoke(SpockNode.java:40)
+	at org.spockframework.runtime.SpecNode.lambda$around$0(SpecNode.java:72)
+	at org.spockframework.runtime.PlatformSpecRunner.lambda$createMethodInfoForDoRunSpec$0(PlatformSpecRunner.java:66)
+	at org.spockframework.runtime.model.MethodInfo.invoke(MethodInfo.java:157)
+	at org.spockframework.runtime.PlatformSpecRunner.invokeRaw(PlatformSpecRunner.java:442)
+	at org.spockframework.runtime.PlatformSpecRunner.invoke(PlatformSpecRunner.java:425)
+	at org.spockframework.runtime.PlatformSpecRunner.runSpec(PlatformSpecRunner.java:59)
+	at org.spockframework.runtime.SpecNode.around(SpecNode.java:72)
+	at org.spockframework.runtime.SpecNode.around(SpecNode.java:12)
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.lambda$executeRecursively$0(NodeTestTask.java:164)
+	at org.junit.platform.engine.support.hierarchical.ThrowableCollector.execute(ThrowableCollector.java:74)
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.executeRecursively(NodeTestTask.java:163)
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.execute(NodeTestTask.java:116)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1596)
+	at org.junit.platform.engine.support.hierarchical.SameThreadHierarchicalTestExecutorService.invokeAll(SameThreadHierarchicalTestExecutorService.java:42)
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.lambda$executeRecursively$2(NodeTestTask.java:180)
+	at org.junit.platform.engine.support.hierarchical.ThrowableCollector.execute(ThrowableCollector.java:74)
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.lambda$executeRecursively$1(NodeTestTask.java:166)
+	at org.junit.platform.engine.support.hierarchical.Node.around(Node.java:139)
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.lambda$executeRecursively$0(NodeTestTask.java:164)
+	at org.junit.platform.engine.support.hierarchical.ThrowableCollector.execute(ThrowableCollector.java:74)
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.executeRecursively(NodeTestTask.java:163)
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.execute(NodeTestTask.java:116)
+	at org.junit.platform.engine.support.hierarchical.SameThreadHierarchicalTestExecutorService.submit(SameThreadHierarchicalTestExecutorService.java:36)
+	at org.junit.platform.engine.support.hierarchical.HierarchicalTestExecutor.execute(HierarchicalTestExecutor.java:52)
+	at org.junit.platform.engine.support.hierarchical.HierarchicalTestEngine.execute(HierarchicalTestEngine.java:58)
+	at org.junit.platform.launcher.core.EngineExecutionOrchestrator.executeEngine(EngineExecutionOrchestrator.java:256)
+	at org.junit.platform.launcher.core.EngineExecutionOrchestrator.failOrExecuteEngine(EngineExecutionOrchestrator.java:228)
+	at org.junit.platform.launcher.core.EngineExecutionOrchestrator.execute(EngineExecutionOrchestrator.java:189)
+	at org.junit.platform.launcher.core.EngineExecutionOrchestrator.execute(EngineExecutionOrchestrator.java:109)
+	at org.junit.platform.launcher.core.EngineExecutionOrchestrator.execute(EngineExecutionOrchestrator.java:90)
+	at org.junit.platform.suite.engine.SuiteLauncher.execute(SuiteLauncher.java:65)
+	at org.junit.platform.suite.engine.SuiteTestDescriptor.executeTests(SuiteTestDescriptor.java:212)
+	at org.junit.platform.suite.engine.SuiteTestDescriptor.execute(SuiteTestDescriptor.java:178)
+	at org.junit.platform.suite.engine.SuiteTestEngine.execute(SuiteTestEngine.java:80)
+	at org.junit.platform.launcher.core.EngineExecutionOrchestrator.executeEngine(EngineExecutionOrchestrator.java:256)
+	at org.junit.platform.launcher.core.EngineExecutionOrchestrator.failOrExecuteEngine(EngineExecutionOrchestrator.java:228)
+	at org.junit.platform.launcher.core.EngineExecutionOrchestrator.execute(EngineExecutionOrchestrator.java:189)
+	at org.junit.platform.launcher.core.EngineExecutionOrchestrator.execute(EngineExecutionOrchestrator.java:109)
+	at org.junit.platform.launcher.core.EngineExecutionOrchestrator.lambda$execute$0(EngineExecutionOrchestrator.java:66)
+	at org.junit.platform.launcher.core.EngineExecutionOrchestrator.withInterceptedStreams(EngineExecutionOrchestrator.java:168)
+	at org.junit.platform.launcher.core.EngineExecutionOrchestrator.execute(EngineExecutionOrchestrator.java:65)
+	at org.junit.platform.launcher.core.DefaultLauncher.execute(DefaultLauncher.java:137)
+	at org.junit.platform.launcher.core.DefaultLauncher.execute(DefaultLauncher.java:126)
+	at org.junit.platform.launcher.core.DefaultLauncher.execute(DefaultLauncher.java:100)
+	at org.junit.platform.launcher.core.DelegatingLauncher.execute(DelegatingLauncher.java:57)
+	at org.junit.platform.launcher.core.InterceptingLauncher.lambda$execute$0(InterceptingLauncher.java:46)
+	at org.junit.platform.launcher.core.ClasspathAlignmentCheckingLauncherInterceptor.intercept(ClasspathAlignmentCheckingLauncherInterceptor.java:25)
+	at org.junit.platform.launcher.core.InterceptingLauncher.execute(InterceptingLauncher.java:45)
+	at org.junit.platform.launcher.core.DelegatingLauncher.execute(DelegatingLauncher.java:57)
+	at org.gradle.api.internal.tasks.testing.junitplatform.JUnitPlatformTestClassProcessor$CollectAllTestClassesExecutor.processAllTestClasses(JUnitPlatformTestClassProcessor.java:135)
+	at org.gradle.api.internal.tasks.testing.junitplatform.JUnitPlatformTestClassProcessor$CollectAllTestClassesExecutor.access$000(JUnitPlatformTestClassProcessor.java:110)
+	at org.gradle.api.internal.tasks.testing.junitplatform.JUnitPlatformTestClassProcessor.stop(JUnitPlatformTestClassProcessor.java:104)
+	at org.gradle.api.internal.tasks.testing.SuiteTestClassProcessor.stop(SuiteTestClassProcessor.java:64)
+	at java.base/jdk.internal.reflect.DirectMethodHandleAccessor.invoke(DirectMethodHandleAccessor.java:103)
+	at org.gradle.internal.dispatch.MethodInvocation.invokeOn(MethodInvocation.java:77)
+	at org.gradle.internal.dispatch.ReflectionDispatch.dispatch(ReflectionDispatch.java:28)
+	at org.gradle.internal.dispatch.ReflectionDispatch.dispatch(ReflectionDispatch.java:19)
+	at org.gradle.internal.dispatch.ContextClassLoaderDispatch.dispatch(ContextClassLoaderDispatch.java:33)
+	at org.gradle.internal.dispatch.ProxyDispatchAdapter$DispatchingInvocationHandler.invoke(ProxyDispatchAdapter.java:88)
+	at jdk.proxy1/jdk.proxy1.$Proxy4.stop(Unknown Source)
+	at org.gradle.api.internal.tasks.testing.worker.TestWorker$3.run(TestWorker.java:194)
+	at org.gradle.api.internal.tasks.testing.worker.TestWorker.executeAndMaintainThreadName(TestWorker.java:126)
+	at org.gradle.api.internal.tasks.testing.worker.TestWorker.execute(TestWorker.java:103)
+	at org.gradle.api.internal.tasks.testing.worker.TestWorker.execute(TestWorker.java:63)
+	at org.gradle.process.internal.worker.child.ActionExecutionWorker.execute(ActionExecutionWorker.java:56)
+	at org.gradle.process.internal.worker.child.SystemApplicationClassLoaderWorker.call(SystemApplicationClassLoaderWorker.java:122)
+	at org.gradle.process.internal.worker.child.SystemApplicationClassLoaderWorker.call(SystemApplicationClassLoaderWorker.java:72)
+	at worker.org.gradle.process.internal.worker.GradleWorkerMain.run(GradleWorkerMain.java:69)
+	at worker.org.gradle.process.internal.worker.GradleWorkerMain.main(GradleWorkerMain.java:74)
+?[32m21:45:42.424  INFO  Test worker             o.moqui.i.c.UserFacadeImpl?[m Setting hasLoggedOut for user ES_TECH2
+?[33m21:45:42.439  WARN  Test worker .moqui.i.c.ArtifactExecutionFacadeImpl?[m Artifact authorization failed: User es.tech1 is not authorized for All on Service ElectricalService.ElectricalServiceServices.schedule#Visit
+Current artifact info: [name:'ElectricalService.ElectricalServiceServices.schedule#Visit', type:'AT_SERVICE', action:'AUTHZA_ALL', required: true, granted:false, user:'null', authz:'null', authAction:'null', inheritable:false, runningTime:0', txId:null]
+Current artifact stack:
+?[32m21:45:42.439  INFO  Test worker             o.moqui.i.c.UserFacadeImpl?[m Setting hasLoggedOut for user ES_TECH1
+</pre>
+<button class="clipboard-copy-btn" aria-label="Copy to clipboard" data-copy-element-id="class-stdout">Copy</button>
+</span>
+</div>
+</div>
+<div id="footer">
+<p>
+<div>
+<label class="hidden" id="label-for-line-wrapping-toggle" for="line-wrapping-toggle">Wrap lines
+<input id="line-wrapping-toggle" type="checkbox" autocomplete="off"/>
+</label>
+</div>Generated by 
+<a href="https://www.gradle.org">Gradle 9.2.0</a> at Sep 30, 2026, 9:45:43 PM</p>
+</div>
+</div>
+</body>
+</html>

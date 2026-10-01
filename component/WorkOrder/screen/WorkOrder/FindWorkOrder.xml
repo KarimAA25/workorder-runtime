@@ -1,0 +1,158 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<screen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://moqui.org/xsd/xml-screen-3.xsd"
+        default-menu-include="false">
+
+    <transition name="findWorkOrder"><default-response url="."/></transition>
+    <transition name="editWorkOrder"><default-response url="../EditWorkOrder"/></transition>
+    <transition name="createWorkOrder" authz-action="create">
+        <service-call name="electrical.WorkOrderServices.create#WorkOrder"
+                in-map="[customerName:customerName, customerPhone:customerPhone, title:title, description:description,
+                    priority:priority, assignedTo:assignedTo, scheduledDate:scheduledDate]"/>
+        <default-response url="."/></transition>
+    <transition name="testValidateFields" authz-action="view">
+        <actions>
+            <service-call name="electrical.WorkOrderServices.validate#WorkOrderFields"
+                    in-map="[status:status, priority:priority, estimatedHours:estimatedHours, actualHours:actualHours,
+                        estimatedCost:estimatedCost, actualCost:actualCost]"/>
+            <message>Validation passed - no errors</message>
+        </actions>
+        <default-response url="."/></transition>
+
+    <!-- Parameters for the "Call find#WorkOrders" panel below - declared at screen level (not
+         required) so Moqui's standard parameter-forwarding carries them through the no-op
+         findWorkOrder transition's redisplay, same mechanism the grid's own Find button relies
+         on for its search-form-inputs filters. -->
+    <parameter name="svcStatus"/>
+    <parameter name="svcPriority"/>
+    <parameter name="svcAssignedTo"/>
+    <parameter name="svcCustomerName"/>
+    <parameter name="svcScheduledDateFrom"/>
+    <parameter name="svcScheduledDateThru"/>
+    <parameter name="svcPageIndex" default="0"/>
+    <parameter name="svcPageSize" default="20"/>
+
+    <actions>
+        <!-- Unconditional, read-only, no side effects - safe to run on every render so the
+             find#WorkOrders service (not just the grid's inline entity-find above) is always
+             actually exercised by this screen. -->
+        <service-call name="electrical.WorkOrderServices.find#WorkOrders" out-map="context"
+                in-map="[status:svcStatus, priority:svcPriority, assignedTo:svcAssignedTo, customerName:svcCustomerName,
+                    scheduledDateFrom:svcScheduledDateFrom, scheduledDateThru:svcScheduledDateThru,
+                    pageIndex:svcPageIndex, pageSize:svcPageSize]"/>
+        <set field="svcWorkOrderList" from="workOrderList"/>
+        <set field="svcTotalCount" from="totalCount"/>
+    </actions>
+    <widgets>
+        <container-dialog id="NewWorkOrderContainer" button-text="New Work Order">
+            <form-single name="NewWorkOrderForm" transition="createWorkOrder">
+                <field name="customerName"><default-field title="Customer Name"><text-line/></default-field></field>
+                <field name="customerPhone"><default-field title="Customer Phone"><text-line/></default-field></field>
+                <field name="title"><default-field title="Title"><text-line size="40"/></default-field></field>
+                <field name="description"><default-field title="Description"><text-area rows="4"/></default-field></field>
+                <field name="priority"><default-field title="Priority">
+                    <drop-down no-current-selected-key="NORMAL"><option key="LOW"/><option key="NORMAL"/>
+                        <option key="HIGH"/><option key="URGENT"/></drop-down>
+                </default-field></field>
+                <field name="assignedTo"><default-field title="Assigned To"><text-line/></default-field></field>
+                <field name="scheduledDate"><default-field title="Scheduled Date"><date-time type="date"/></default-field></field>
+                <field name="submitButton"><default-field title="Create"><submit/></default-field></field>
+            </form-single>
+        </container-dialog>
+
+        <container-dialog id="TestValidateFieldsContainer" button-text="Validate">
+            <form-single name="TestValidateFieldsForm" transition="testValidateFields">
+                <field name="status"><default-field title="Status">
+                    <drop-down allow-empty="true"><option key="OPEN"/><option key="IN_PROGRESS"/><option key="ON_HOLD"/>
+                        <option key="COMPLETED"/><option key="CANCELLED"/></drop-down></default-field></field>
+                <field name="priority"><default-field title="Priority">
+                    <drop-down allow-empty="true"><option key="LOW"/><option key="NORMAL"/><option key="HIGH"/><option key="URGENT"/></drop-down>
+                </default-field></field>
+                <field name="estimatedHours"><default-field title="Est. Hours"><text-line size="8"/></default-field></field>
+                <field name="actualHours"><default-field title="Actual Hours"><text-line size="8"/></default-field></field>
+                <field name="estimatedCost"><default-field title="Est. Cost"><text-line size="10"/></default-field></field>
+                <field name="actualCost"><default-field title="Actual Cost"><text-line size="10"/></default-field></field>
+                <field name="submitButton"><default-field title="Validate"><submit/></default-field></field>
+            </form-single>
+        </container-dialog>
+
+        <form-list name="ListWorkOrders" list="workOrderList" skip-form="true" header-dialog="true"
+                select-columns="true" saved-finds="true" show-page-size="true">
+            <entity-find entity-name="electrical.WorkOrder" list="workOrderList">
+                <search-form-inputs default-order-by="-createdDate"/>
+            </entity-find>
+
+            <field name="status">
+                <header-field title="Status"><drop-down allow-empty="true">
+                    <option key="OPEN"/><option key="IN_PROGRESS"/><option key="ON_HOLD"/>
+                    <option key="COMPLETED"/><option key="CANCELLED"/></drop-down></header-field>
+                <default-field><display/></default-field>
+            </field>
+            <field name="priority">
+                <header-field title="Priority"><drop-down allow-empty="true">
+                    <option key="LOW"/><option key="NORMAL"/><option key="HIGH"/><option key="URGENT"/></drop-down></header-field>
+                <default-field><display/></default-field>
+            </field>
+            <field name="workOrderId">
+                <header-field title="#"><text-find size="10" hide-options="true"/></header-field>
+                <default-field><link url="editWorkOrder" text="${workOrderId}" link-type="anchor"
+                        parameter-map="[workOrderId:workOrderId]"/></default-field>
+            </field>
+            <field name="title"><header-field title="Title"><text-find hide-options="true"/></header-field>
+                <default-field><link url="editWorkOrder" text="${title}" link-type="anchor"
+                        parameter-map="[workOrderId:workOrderId]"/></default-field></field>
+            <field name="customerName"><header-field title="Customer"><text-find hide-options="true"/></header-field>
+                <default-field><display/></default-field></field>
+            <field name="assignedTo"><header-field title="Assigned To"><text-find hide-options="true"/></header-field>
+                <default-field><display/></default-field></field>
+            <field name="scheduledDate">
+                <header-field title="Scheduled" show-order-by="true"><date-period allow-empty="true"/></header-field>
+                <default-field><display/></default-field>
+            </field>
+
+            <field name="submitButton"><header-field title="Find"><submit/></header-field></field>
+
+            <form-list-column><field-ref name="workOrderId"/><field-ref name="title"/></form-list-column>
+            <form-list-column><field-ref name="customerName"/></form-list-column>
+            <form-list-column><field-ref name="status"/><field-ref name="priority"/></form-list-column>
+            <form-list-column><field-ref name="assignedTo"/></form-list-column>
+            <form-list-column><field-ref name="scheduledDate"/></form-list-column>
+        </form-list>
+
+        <container-box><box-header title="Find WorkOrders (service test)"/><box-body>
+            <form-single name="SvcFindWorkOrdersForm" transition="findWorkOrder">
+                <field name="svcStatus"><default-field title="Status">
+                    <drop-down allow-empty="true"><option key="OPEN"/><option key="IN_PROGRESS"/><option key="ON_HOLD"/>
+                        <option key="COMPLETED"/><option key="CANCELLED"/></drop-down></default-field></field>
+                <field name="svcPriority"><default-field title="Priority">
+                    <drop-down allow-empty="true"><option key="LOW"/><option key="NORMAL"/><option key="HIGH"/><option key="URGENT"/></drop-down>
+                </default-field></field>
+                <field name="svcAssignedTo"><default-field title="Assigned To"><text-line/></default-field></field>
+                <field name="svcCustomerName"><default-field title="Customer Contains"><text-line/></default-field></field>
+                <field name="svcScheduledDateFrom"><default-field title="Scheduled From"><date-time type="date"/></default-field></field>
+                <field name="svcScheduledDateThru"><default-field title="Scheduled Thru"><date-time type="date"/></default-field></field>
+                <field name="svcPageIndex"><default-field title="Page Index"><text-line size="4"/></default-field></field>
+                <field name="svcPageSize"><default-field title="Page Size"><text-line size="4"/></default-field></field>
+                <field name="submitButton"><default-field title="Call Service"><submit/></default-field></field>
+            </form-single>
+
+            <label text="${svcTotalCount} total match(es), showing ${svcWorkOrderList ? svcWorkOrderList.size() : 0}" type="strong"/>
+
+            <form-list name="SvcWorkOrderResults" list="svcWorkOrderList" skip-form="true">
+                <field name="workOrderId"><header-field title="#"/><default-field><display/></default-field></field>
+                <field name="workOrderNumber"><header-field title="Number"/><default-field><display/></default-field></field>
+                <field name="customerName"><header-field title="Customer"/><default-field><display/></default-field></field>
+                <field name="title"><header-field title="Title"/><default-field><display/></default-field></field>
+                <field name="status"><header-field title="Status"/><default-field><display/></default-field></field>
+                <field name="priority"><header-field title="Priority"/><default-field><display/></default-field></field>
+                <field name="assignedTo"><header-field title="Assigned To"/><default-field><display/></default-field></field>
+                <field name="scheduledDate"><header-field title="Scheduled"/><default-field><display/></default-field></field>
+
+                <form-list-column><field-ref name="workOrderId"/><field-ref name="workOrderNumber"/></form-list-column>
+                <form-list-column><field-ref name="customerName"/><field-ref name="title"/></form-list-column>
+                <form-list-column><field-ref name="status"/><field-ref name="priority"/></form-list-column>
+                <form-list-column><field-ref name="assignedTo"/></form-list-column>
+                <form-list-column><field-ref name="scheduledDate"/></form-list-column>
+            </form-list>
+        </box-body></container-box>
+    </widgets>
+</screen>

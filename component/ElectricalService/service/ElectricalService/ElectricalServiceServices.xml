@@ -1,0 +1,196 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<services xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://moqui.org/xsd/service-definition-3.xsd">
+
+    <!-- ===================== Service Request ===================== -->
+
+    <service verb="create" noun="ServiceRequest">
+        <in-parameters>
+            <parameter name="customerPartyId" required="true"/>
+            <parameter name="description"/>
+            <parameter name="priority" type="Long" default="5"/>
+            <parameter name="requestedDate" type="Timestamp" default="ec.user.nowTimestamp"/>
+        </in-parameters>
+        <out-parameters><parameter name="serviceRequestId"/></out-parameters>
+        <actions>
+            <entity-find-one entity-name="mantle.party.PartyRole" value-field="customerRole">
+                <field-map field-name="partyId" from="customerPartyId"/><field-map field-name="roleTypeId" value="Customer"/>
+            </entity-find-one>
+            <if condition="customerRole == null">
+                <return error="true" message="Party ${customerPartyId} is not a Customer"/></if>
+
+            <service-call name="mantle.request.RequestServices.create#Request" out-map="context"
+                    in-map="[customerPartyId:customerPartyId, description:description, priority:priority,
+                        requestDate:requestedDate, requestTypeEnumId:'RtElecService', statusId:'EsrOpen']"/>
+            <set field="serviceRequestId" from="requestId"/>
+        </actions>
+    </service>
+
+    <service verb="update" noun="ServiceRequest">
+        <in-parameters>
+            <parameter name="serviceRequestId" required="true"/>
+            <parameter name="description"/>
+            <parameter name="priority" type="Long"/>
+        </in-parameters>
+        <actions>
+            <service-call name="update#mantle.request.Request"
+                    in-map="[requestId:serviceRequestId, description:description, priority:priority]"/>
+        </actions>
+    </service>
+
+    <service verb="get" noun="ServiceRequest">
+        <in-parameters><parameter name="serviceRequestId" required="true"/></in-parameters>
+        <out-parameters><parameter name="serviceRequest" type="Map"/></out-parameters>
+        <actions>
+            <entity-find-one entity-name="ElectricalService.ElectricalServiceRequestDetail" value-field="serviceRequest">
+                <field-map field-name="serviceRequestId"/></entity-find-one>
+            <if condition="serviceRequest == null"><return error="true" message="Service Request ${serviceRequestId} not found"/></if>
+        </actions>
+    </service>
+
+    <service verb="find" noun="ServiceRequests">
+        <in-parameters>
+            <parameter name="statusId"/>
+            <parameter name="technicianPartyId"/>
+            <parameter name="customerPartyId"/>
+        </in-parameters>
+        <out-parameters><parameter name="serviceRequestList" type="List"/></out-parameters>
+        <actions>
+            <entity-find entity-name="ElectricalService.ElectricalServiceRequestDetail" list="serviceRequestList">
+                <econdition field-name="statusId" ignore-if-empty="true"/>
+                <econdition field-name="technicianPartyId" ignore-if-empty="true"/>
+                <econdition field-name="customerPartyId" ignore-if-empty="true"/>
+                <order-by field-name="-requestedDate"/>
+            </entity-find>
+        </actions>
+    </service>
+
+    <!-- OPEN -> ASSIGNED. Only a Dispatcher can reach this (ES_APP_DISPATCHER); the status
+         transition itself is validated automatically by EntityAutoServiceRunner.checkStatus
+         against the StatusFlowTransition seed data (only EsrOpen -> EsrAssigned is legal). -->
+    <service verb="assign" noun="Technician">
+        <in-parameters>
+            <parameter name="serviceRequestId" required="true"/>
+            <parameter name="technicianPartyId" required="true"/>
+        </in-parameters>
+        <actions>
+            <entity-find-one entity-name="mantle.party.PartyRole" value-field="workerRole">
+                <field-map field-name="partyId" from="technicianPartyId"/><field-map field-name="roleTypeId" value="Worker"/>
+            </entity-find-one>
+            <if condition="workerRole == null">
+                <return error="true" message="Party ${technicianPartyId} is not a Worker (technician)"/></if>
+
+            <service-call name="mantle.request.RequestServices.replace#RequestParty"
+                    in-map="[requestId:serviceRequestId, roleTypeId:'Assignee', newPartyId:technicianPartyId]"/>
+            <service-call name="update#mantle.request.Request" in-map="[requestId:serviceRequestId, statusId:'EsrAssigned']"/>
+        </actions>
+    </service>
+
+    <!-- ASSIGNED -> SCHEDULED. Creates the visit as a mantle.work.effort.WorkEffort (type
+         WetElecVisit) assigned (WorkEffortParty, role Assignee) to the request's current
+         technician, and links it back with RequestWorkEffort - the same shape as
+         mantle.work.TaskServices.create#SimpleTask. Checked up front (not relying only on
+         checkStatus) so a request that isn't Assigned yet fails before any visit records
+         are created. -->
+    <service verb="schedule" noun="Visit">
+        <in-parameters>
+            <parameter name="serviceRequestId" required="true"/>
+            <parameter name="scheduledDate" type="Timestamp" required="true"/>
+        </in-parameters>
+        <out-parameters><parameter name="serviceVisitId"/></out-parameters>
+        <actions>
+            <entity-find-one entity-name="mantle.request.Request" value-field="request">
+                <field-map field-name="requestId" from="serviceRequestId"/></entity-find-one>
+            <if condition="request == null"><return error="true" message="Service Request ${serviceRequestId} not found"/></if>
+            <if condition="request.statusId != 'EsrAssigned'">
+                <return error="true" message="Service Request ${serviceRequestId} must be Assigned before a visit can be scheduled (is ${request.statusId})"/></if>
+
+            <entity-find entity-name="mantle.request.RequestParty" list="assigneeList">
+                <date-filter/><econdition field-name="requestId" from="serviceRequestId"/>
+                <econdition field-name="roleTypeId" value="Assignee"/></entity-find>
+            <set field="technicianPartyId" from="assigneeList ? assigneeList[0].partyId : null"/>
+            <if condition="!technicianPartyId"><return error="true" message="Service Request ${serviceRequestId} has no assigned technician"/></if>
+
+            <service-call name="create#mantle.work.effort.WorkEffort" out-map="context"
+                    in-map="[workEffortTypeEnumId:'WetElecVisit', statusId:'EsvScheduled',
+                        estimatedStartDate:scheduledDate, workEffortName:'Electrical Service Visit for Request ' + serviceRequestId]"/>
+            <set field="serviceVisitId" from="workEffortId"/>
+            <service-call name="create#ElectricalService.ElectricalServiceVisit" in-map="[workEffortId:serviceVisitId]"/>
+            <service-call name="create#mantle.work.effort.WorkEffortParty"
+                    in-map="[workEffortId:serviceVisitId, partyId:technicianPartyId, roleTypeId:'Assignee',
+                        fromDate:ec.user.nowTimestamp, statusId:'WeptAssigned']"/>
+            <service-call name="create#mantle.request.RequestWorkEffort" in-map="[requestId:serviceRequestId, workEffortId:serviceVisitId]"/>
+            <service-call name="update#mantle.request.Request" in-map="[requestId:serviceRequestId, statusId:'EsrScheduled']"/>
+        </actions>
+    </service>
+
+    <!-- SCHEDULED -> IN_PROGRESS on both the Visit (WorkEffort) and its Request. A Technician
+         may only start a visit assigned to them; a Dispatcher may start any visit. -->
+    <service verb="start" noun="Visit">
+        <in-parameters><parameter name="serviceVisitId" required="true"/></in-parameters>
+        <actions>
+            <entity-find-one entity-name="ElectricalService.ElectricalServiceVisitDetail" value-field="visit">
+                <field-map field-name="serviceVisitId" from="serviceVisitId"/></entity-find-one>
+            <if condition="visit == null"><return error="true" message="Service Visit ${serviceVisitId} not found"/></if>
+            <if condition="!ec.user.isInGroup('ES_DISPATCHER') &amp;&amp; visit.technicianPartyId != ec.user.userAccount?.partyId">
+                <return error="true" message="You are not the technician assigned to Service Visit ${serviceVisitId}"/></if>
+            <if condition="visit.statusId != 'EsvScheduled'">
+                <return error="true" message="Service Visit ${serviceVisitId} must be Scheduled to start (is ${visit.statusId})"/></if>
+
+            <service-call name="update#mantle.work.effort.WorkEffort"
+                    in-map="[workEffortId:serviceVisitId, statusId:'EsvInProgress', actualStartDate:ec.user.nowTimestamp]"/>
+            <if condition="visit.serviceRequestId">
+                <service-call name="update#mantle.request.Request" in-map="[requestId:visit.serviceRequestId, statusId:'EsrInProgress']"/></if>
+        </actions>
+    </service>
+
+    <!-- IN_PROGRESS -> COMPLETED on both the Visit (WorkEffort, plus work notes) and its
+         Request. Same assigned-technician-or-Dispatcher rule as start#Visit. -->
+    <service verb="complete" noun="Visit">
+        <in-parameters>
+            <parameter name="serviceVisitId" required="true"/>
+            <parameter name="workNotes"/>
+        </in-parameters>
+        <actions>
+            <entity-find-one entity-name="ElectricalService.ElectricalServiceVisitDetail" value-field="visit">
+                <field-map field-name="serviceVisitId" from="serviceVisitId"/></entity-find-one>
+            <if condition="visit == null"><return error="true" message="Service Visit ${serviceVisitId} not found"/></if>
+            <if condition="!ec.user.isInGroup('ES_DISPATCHER') &amp;&amp; visit.technicianPartyId != ec.user.userAccount?.partyId">
+                <return error="true" message="You are not the technician assigned to Service Visit ${serviceVisitId}"/></if>
+            <if condition="visit.statusId != 'EsvInProgress'">
+                <return error="true" message="Service Visit ${serviceVisitId} must be In Progress to complete (is ${visit.statusId})"/></if>
+
+            <service-call name="update#mantle.work.effort.WorkEffort"
+                    in-map="[workEffortId:serviceVisitId, statusId:'EsvCompleted', actualCompletionDate:ec.user.nowTimestamp]"/>
+            <service-call name="update#ElectricalService.ElectricalServiceVisit" in-map="[workEffortId:serviceVisitId, workNotes:workNotes]"/>
+            <if condition="visit.serviceRequestId">
+                <service-call name="update#mantle.request.Request" in-map="[requestId:visit.serviceRequestId, statusId:'EsrCompleted']"/></if>
+        </actions>
+    </service>
+
+    <!-- COMPLETED -> CLOSED. Dispatcher only (not in ES_TECHNICIAN_ACTIONS). -->
+    <service verb="close" noun="ServiceRequest">
+        <in-parameters><parameter name="serviceRequestId" required="true"/></in-parameters>
+        <actions>
+            <service-call name="update#mantle.request.Request" in-map="[requestId:serviceRequestId, statusId:'EsrClosed']"/>
+        </actions>
+    </service>
+
+    <!-- REST convenience: "complete a service request" without the caller needing to know
+         the internal visit id - finds the request's current in-progress visit and delegates
+         to complete#Visit (no duplicated logic). -->
+    <service verb="complete" noun="ServiceRequest">
+        <in-parameters>
+            <parameter name="serviceRequestId" required="true"/>
+            <parameter name="workNotes"/>
+        </in-parameters>
+        <actions>
+            <entity-find entity-name="ElectricalService.ElectricalServiceVisitDetail" list="visitList">
+                <econdition field-name="serviceRequestId"/><econdition field-name="statusId" value="EsvInProgress"/></entity-find>
+            <if condition="!visitList">
+                <return error="true" message="No in-progress visit found for Service Request ${serviceRequestId}"/></if>
+            <service-call name="ElectricalService.ElectricalServiceServices.complete#Visit"
+                    in-map="[serviceVisitId:visitList[0].serviceVisitId, workNotes:workNotes]"/>
+        </actions>
+    </service>
+
+</services>

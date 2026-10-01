@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Auto-discovered by RestApi (any *.rest.xml under a component's service/ dir).
+     require-authentication left at its default (true); authorization is entirely
+     through the services these paths call (see data/WorkOrderSecurityData.xml). -->
+<resource xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://moqui.org/xsd/rest-api-3.xsd"
+        name="workorder" displayName="Work Order REST API" version="1.0.0">
+    <resource name="workOrders" description="Work orders">
+        <method type="get"><service name="electrical.WorkOrderServices.find#WorkOrders"/></method>
+        <method type="post"><service name="electrical.WorkOrderServices.create#WorkOrder"/></method>
+        <id name="workOrderId">
+            <method type="get"><service name="electrical.WorkOrderServices.get#WorkOrder"/></method>
+            <method type="patch"><service name="electrical.WorkOrderServices.update#WorkOrder"/></method>
+            <method type="delete"><service name="electrical.WorkOrderServices.delete#WorkOrder"/></method>
+            <resource name="status" description="Work order status transition">
+                <method type="put"><service name="electrical.WorkOrderServices.update#WorkOrderStatus"/></method>
+            </resource>
+        </id>
+    </resource>
+</resource>

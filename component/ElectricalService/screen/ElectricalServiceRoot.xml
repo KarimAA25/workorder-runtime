@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<screen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://moqui.org/xsd/xml-screen-3.xsd"
+        default-menu-title="Electrical Service" menu-image="fa fa-bolt" menu-image-type="icon">
+    <always-actions>
+        <set field="appRoot" value="es"/>
+    </always-actions>
+    <subscreens default-item="Dashboard" always-use-full-path="true">
+        <subscreens-item name="ServiceRequests" menu-index="2"
+                location="component://ElectricalService/screen/ElectricalServiceRoot/ServiceRequests.xml"/>
+        <subscreens-item name="ServiceVisits" menu-index="3"
+                location="component://ElectricalService/screen/ElectricalServiceRoot/ServiceVisits.xml"/>
+    </subscreens>
+    <widgets>
+        <subscreens-panel id="ElectricalServicePanel" type="popup" title="Electrical Service"/>
+    </widgets>
+</screen>

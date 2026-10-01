@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<screen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://moqui.org/xsd/xml-screen-3.xsd"
+        default-menu-title="Service Requests" default-menu-index="1" menu-image="fa fa-clipboard-list" menu-image-type="icon">
+    <subscreens default-item="FindServiceRequest">
+        <subscreens-item name="FindServiceRequest" menu-include="false"
+                location="component://ElectricalService/screen/ElectricalServiceRoot/ServiceRequests/FindServiceRequest.xml"/>
+        <subscreens-item name="EditServiceRequest" menu-include="false"
+                location="component://ElectricalService/screen/ElectricalServiceRoot/ServiceRequests/EditServiceRequest.xml"/>
+    </subscreens>
+    <widgets><subscreens-panel id="ServiceRequestsPanel" type="tab"/></widgets>
+</screen>
